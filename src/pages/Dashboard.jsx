@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
 import { rowToCue, cueToRow, rowToBatch, batchToRow } from '../lib/mappers'
-import { PIPELINE_STATUSES, today } from '../lib/constants'
+import { PIPELINE_STATUSES, today, parseCsv } from '../lib/constants'
 import StatsBar from '../components/StatsBar'
 import PipelineView from '../components/PipelineView'
 import CatalogView from '../components/CatalogView'
@@ -134,24 +134,27 @@ export default function Dashboard() {
     if (!file) return
     const reader = new FileReader()
     reader.onload = async (ev) => {
-      const text = ev.target.result
-      const lines = text.split(/\r?\n/).filter((l) => l.trim())
-      if (lines.length < 2) return
-      const headers = lines[0].split(',').map((h) => h.replace(/^"|"$/g, '').trim())
+      const rows = parseCsv(ev.target.result)
+      if (rows.length < 2) return
+      const headers = rows[0].map((h) => h.trim())
+      const col = (name) => headers.indexOf(name)
+      const hasAirShow = col('Air Show') >= 0
+      const yesno = (v) => String(v || '').trim().toLowerCase() === 'yes'
+
       const newCues = []
-      for (let i = 1; i < lines.length; i++) {
-        const vals = lines[i].match(/("([^"]*("")*)*"|[^,]*)/g) || []
-        const clean = vals.map((v) => v.replace(/^"|"$/g, '').replace(/""/g, '"').trim())
+      for (let i = 1; i < rows.length; i++) {
+        const r = rows[i]
         const get = (name) => {
-          const idx = headers.indexOf(name)
-          return idx >= 0 ? clean[idx] || '' : ''
+          const idx = col(name)
+          return idx >= 0 ? (r[idx] || '').trim() : ''
         }
-        const yesno = (v) => v.toLowerCase() === 'yes'
         const title = get('Title')
-        if (!title) continue
+        if (!title) continue // skip blank/trailing rows
+        // If the file has no dedicated "Air Show" column, its "Show" column is
+        // the broadcast show (as in the raw catalog export), so route it there.
         newCues.push({
           title,
-          show: get('Show'),
+          show: hasAirShow ? get('Show') : '',
           batchId: null,
           genre: get('Genre'),
           notes: get('Notes'),
@@ -167,7 +170,7 @@ export default function Dashboard() {
           bpm: get('BPM'),
           duration: get('Duration'),
           airNetwork: get('Network'),
-          airShow: get('Air Show'),
+          airShow: get('Air Show') || get('Show'),
           airEpisode: get('Episode'),
           firstAirDate: get('First Air Date'),
           pitchedTo: [],

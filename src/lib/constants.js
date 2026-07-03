@@ -61,3 +61,56 @@ export function daysBetween(d1, d2) {
 export function today() {
   return new Date().toISOString().split('T')[0]
 }
+
+// Parse CSV text into an array of row arrays. Handles quoted fields that
+// contain commas, escaped double-quotes (""), and CR/LF line endings —
+// which a naive split(',') / split('\n') gets wrong.
+export function parseCsv(text) {
+  const rows = []
+  let row = []
+  let field = ''
+  let inQuotes = false
+  let started = false // did the current row have any content?
+
+  const endField = () => {
+    row.push(field)
+    field = ''
+  }
+  const endRow = () => {
+    endField()
+    rows.push(row)
+    row = []
+    started = false
+  }
+
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i]
+    if (inQuotes) {
+      if (c === '"') {
+        if (text[i + 1] === '"') {
+          field += '"'
+          i++
+        } else {
+          inQuotes = false
+        }
+      } else {
+        field += c
+      }
+    } else if (c === '"') {
+      inQuotes = true
+      started = true
+    } else if (c === ',') {
+      started = true
+      endField()
+    } else if (c === '\n' || c === '\r') {
+      if (c === '\r' && text[i + 1] === '\n') i++
+      // Only close a row that actually has content, so blank lines are skipped.
+      if (started || field !== '' || row.length) endRow()
+    } else {
+      started = true
+      field += c
+    }
+  }
+  if (started || field !== '' || row.length) endRow()
+  return rows
+}
