@@ -336,6 +336,7 @@ export function EditCueModal({ cue, batches, onSave, onAddBatch, onClose }) {
   const [dueDate, setDueDate] = useState(cue.dueDate || '')
   const [publisher, setPublisher] = useState(cue.publisher || '')
   const [exclusivity, setExclusivity] = useState(cue.exclusivity || '')
+  const [placement, setPlacement] = useState(cue.placement || '')
   const [tuneSat, setTuneSat] = useState(cue.tuneSat || false)
   const [ascap, setAscap] = useState(cue.ascap || false)
   const [onDisco, setOnDisco] = useState(cue.onDisco || false)
@@ -378,7 +379,7 @@ export function EditCueModal({ cue, batches, onSave, onAddBatch, onClose }) {
     setSaving(true)
     const ok = await onSave({
       ...cue, title: title.trim(), show, batchId: batchId || null, genre, notes, dueDate,
-      publisher, exclusivity, tuneSat, ascap, onDisco, musicalKey, bpm, duration,
+      publisher, exclusivity, placement, tuneSat, ascap, onDisco, musicalKey, bpm, duration,
       airNetwork, airShow, airEpisode, firstAirDate,
     })
     setSaving(false)
@@ -447,6 +448,10 @@ export function EditCueModal({ cue, batches, onSave, onAddBatch, onClose }) {
                   {withValue(EXCLUSIVITY_OPTIONS, exclusivity).map((o) => (<option key={o} value={o}>{o}</option>))}
                 </select>
               </div>
+            </div>
+            <div className="field">
+              <label className="label">Placement</label>
+              <input value={placement} onChange={(e) => setPlacement(e.target.value)} placeholder="e.g. Bravo: BDMED 10" />
             </div>
             <div style={{ display: 'flex', gap: 20, marginBottom: 14 }}>
               {[['TuneSat', tuneSat, setTuneSat], ['ASCAP', ascap, setAscap], ['On Disco', onDisco, setOnDisco]].map(([label, val, setter]) => (

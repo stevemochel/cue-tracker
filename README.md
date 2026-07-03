@@ -98,28 +98,18 @@ The app maps these to camelCase internally (`tuneSat`, `onDisco`, `dueDate`, `pi
 
 `batches`: `name`, `sign_up`, `deliver`.
 
-### Assumptions worth confirming against your schema
+### Schema (verified against the live project)
 
-1. **`user_id` column** — both tables are assumed to have a `user_id` (referencing
-   `auth.users`). Every insert stamps it so your `WITH CHECK (auth.uid() = user_id)` policy
-   passes. If it's named differently or defaults to `auth.uid()`, adjust `src/lib/mappers.js`.
-2. **`pitched_to` is `jsonb`** — stored as an array of `{ id, publisher, date, notes }`.
-3. **`tunesat` / `ascap` / `on_disco` are booleans**; **`bpm`** is numeric; date columns
-   (`due_date`, `first_air_date`, `sign_up`, `deliver`) are `date`.
-4. The Dashboard tries to `order` cues by a `created_at` column and silently falls back to an
-   unordered fetch if you don't have one — add `created_at timestamptz default now()` for
-   stable ordering.
+Confirmed against the actual `cues` / `batches` tables:
 
-Recommended RLS policy (per table):
-
-```sql
-alter table cues enable row level security;
-
-create policy "Users manage their own cues"
-  on cues for all
-  using (auth.uid() = user_id)
-  with check (auth.uid() = user_id);
-```
+1. **`user_id`** — `uuid`, FK to `auth.users`, on both tables. Every insert stamps it, and the
+   RLS policies (`select` / `insert` / `update` / `delete`, all `auth.uid() = user_id`) are in place.
+2. **`pitched_to` is `jsonb`** (default `'[]'`) — stored as an array of `{ id, publisher, date, notes }`.
+3. **`tunesat` / `ascap` / `on_disco` are booleans**; **`bpm` is `text`** (kept as a string, not
+   coerced to a number); `placement` is a `text` column; date columns (`due_date`,
+   `first_air_date`, `sign_up`, `deliver`) are `date`.
+4. **`created_at timestamptz default now()`** exists on both tables — cues are ordered by it.
+   `cues.updated_at` also exists.
 
 > The original had `SHOWS` and `PUBLISHERS` hard-coded (Below Deck, The Challenge, etc.);
 > those live in `src/lib/constants.js` — edit them to match your own shows and publishers.

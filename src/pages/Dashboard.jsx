@@ -114,12 +114,12 @@ export default function Dashboard() {
 
   // ── CSV export / import ──
   const exportCSV = () => {
-    const headers = ['Title', 'Status', 'Show', 'Genre', 'Publisher', 'Exclusivity', 'TuneSat', 'ASCAP', 'On Disco', 'Key', 'BPM', 'Duration', 'Network', 'Air Show', 'Episode', 'First Air Date', 'Notes', 'Batch', 'Due Date', 'Pitched To']
+    const headers = ['Title', 'Status', 'Show', 'Genre', 'Publisher', 'Exclusivity', 'Placement', 'TuneSat', 'ASCAP', 'On Disco', 'Key', 'BPM', 'Duration', 'Network', 'Air Show', 'Episode', 'First Air Date', 'Notes', 'Batch', 'Due Date', 'Pitched To']
     const rows = [headers.join(',')]
     cues.forEach((c) => {
       const pitched = (c.pitchedTo || []).map((p) => `${p.publisher} (${p.date})`).join('; ')
       const batch = batches.find((b) => b.id === c.batchId)
-      const row = [c.title, c.status, c.show, c.genre, c.publisher, c.exclusivity, c.tuneSat ? 'Yes' : 'No', c.ascap ? 'Yes' : 'No', c.onDisco ? 'Yes' : 'No', c.musicalKey, c.bpm, c.duration, c.airNetwork || '', c.airShow || '', c.airEpisode || '', c.firstAirDate || '', c.notes, batch ? batch.name : '', c.dueDate, pitched].map((v) => '"' + String(v ?? '').replace(/"/g, '""') + '"')
+      const row = [c.title, c.status, c.show, c.genre, c.publisher, c.exclusivity, c.placement || '', c.tuneSat ? 'Yes' : 'No', c.ascap ? 'Yes' : 'No', c.onDisco ? 'Yes' : 'No', c.musicalKey, c.bpm, c.duration, c.airNetwork || '', c.airShow || '', c.airEpisode || '', c.firstAirDate || '', c.notes, batch ? batch.name : '', c.dueDate, pitched].map((v) => '"' + String(v ?? '').replace(/"/g, '""') + '"')
       rows.push(row.join(','))
     })
     const blob = new Blob([rows.join('\n')], { type: 'text/csv' })
@@ -159,6 +159,7 @@ export default function Dashboard() {
           status: get('Status') || 'accepted',
           publisher: get('Publisher'),
           exclusivity: get('Exclusivity') || get('Exclusive/Non-Exclusive'),
+          placement: get('Placement') || get('Placements'),
           tuneSat: yesno(get('TuneSat')),
           ascap: yesno(get('ASCAP')),
           onDisco: yesno(get('On Disco?') || get('On Disco')),
