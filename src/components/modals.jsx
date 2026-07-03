@@ -129,6 +129,11 @@ export function AddCueModal({ batches, onAdd, onAddBatch, onClose }) {
   )
 }
 
+// Ensure a stored value is always selectable, even if it isn't a preset option.
+function withValue(options, value) {
+  return value && !options.includes(value) ? [value, ...options] : options
+}
+
 // ─── Accept into Catalog Modal ───
 export function AcceptModal({ cue, onAccept, onClose }) {
   const [publisher, setPublisher] = useState(cue.publisher || PUBLISHERS[0])
@@ -156,13 +161,13 @@ export function AcceptModal({ cue, onAccept, onClose }) {
           <div className="field">
             <label className="label">Publisher</label>
             <select value={publisher} onChange={(e) => setPublisher(e.target.value)}>
-              {PUBLISHERS.map((p) => (<option key={p} value={p}>{p}</option>))}
+              {withValue(PUBLISHERS, publisher).map((p) => (<option key={p} value={p}>{p}</option>))}
             </select>
           </div>
           <div className="field">
             <label className="label">Exclusivity</label>
             <select value={exclusivity} onChange={(e) => setExclusivity(e.target.value)}>
-              {EXCLUSIVITY_OPTIONS.map((o) => (<option key={o} value={o}>{o}</option>))}
+              {withValue(EXCLUSIVITY_OPTIONS, exclusivity).map((o) => (<option key={o} value={o}>{o}</option>))}
             </select>
           </div>
         </div>
@@ -432,14 +437,14 @@ export function EditCueModal({ cue, batches, onSave, onAddBatch, onClose }) {
                 <label className="label">Publisher</label>
                 <select value={publisher} onChange={(e) => setPublisher(e.target.value)}>
                   <option value="">—</option>
-                  {PUBLISHERS.map((p) => (<option key={p} value={p}>{p}</option>))}
+                  {withValue(PUBLISHERS, publisher).map((p) => (<option key={p} value={p}>{p}</option>))}
                 </select>
               </div>
               <div className="field">
                 <label className="label">Exclusivity</label>
                 <select value={exclusivity} onChange={(e) => setExclusivity(e.target.value)}>
                   <option value="">—</option>
-                  {EXCLUSIVITY_OPTIONS.map((o) => (<option key={o} value={o}>{o}</option>))}
+                  {withValue(EXCLUSIVITY_OPTIONS, exclusivity).map((o) => (<option key={o} value={o}>{o}</option>))}
                 </select>
               </div>
             </div>

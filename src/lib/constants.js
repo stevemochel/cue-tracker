@@ -16,6 +16,7 @@ export const PUBLISHERS = [
   'Pond5',
   'ThatPitch',
   'Pond5, ThatPitch',
+  'Pond5, Tunedge',
   'Pond5, ThatPitch, Tunedge',
   'Other',
 ]
