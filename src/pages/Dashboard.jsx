@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
 import { rowToCue, cueToRow, rowToBatch, batchToRow } from '../lib/mappers'
-import { PIPELINE_STATUSES, today, parseCsv } from '../lib/constants'
+import { PIPELINE_STATUSES, today, parseCsv, newId } from '../lib/constants'
 import StatsBar from '../components/StatsBar'
 import PipelineView from '../components/PipelineView'
 import CatalogView from '../components/CatalogView'
@@ -32,11 +32,28 @@ export default function Dashboard() {
   const [editCue, setEditCue] = useState(null)
   const [airedCue, setAiredCue] = useState(null)
 
+  // Whether the DB has the `airings` column yet. If not (older schema), we omit
+  // it from writes so nothing errors, and fall back to the single air_* columns.
+  const hasAiringsRef = useRef(true)
+
+  // Build a DB payload, dropping `airings` if the column isn't present yet.
+  const toRow = useCallback(
+    (cue) => {
+      const row = cueToRow(cue, user.id)
+      if (!hasAiringsRef.current) delete row.airings
+      return row
+    },
+    [user.id]
+  )
+
   // ── Load everything for the signed-in user (RLS scopes it automatically) ──
   useEffect(() => {
     let active = true
     ;(async () => {
       setLoading(true)
+      // Detect the `airings` column (errors only if it doesn't exist).
+      const probe = await supabase.from('cues').select('airings').limit(1)
+      if (active) hasAiringsRef.current = !probe.error
       const [cuesRes, batchesRes] = await Promise.all([
         supabase.from('cues').select('*').order('created_at', { ascending: true }),
         supabase.from('batches').select('*'),
@@ -68,12 +85,12 @@ export default function Dashboard() {
   // ── Mutations (return a truthy value on success so modals can close) ──
   const addCue = useCallback(
     async (cue) => {
-      const { data, error: e } = await supabase.from('cues').insert(cueToRow(cue, user.id)).select().single()
+      const { data, error: e } = await supabase.from('cues').insert(toRow(cue)).select().single()
       if (e) return fail('Could not add cue', e)
       setCues((prev) => [...prev, rowToCue(data)])
       return true
     },
-    [user.id]
+    [toRow]
   )
 
   const addBatch = useCallback(
@@ -104,12 +121,37 @@ export default function Dashboard() {
 
   const updateCue = useCallback(
     async (updated) => {
-      const { data, error: e } = await supabase.from('cues').update(cueToRow(updated, user.id)).eq('id', updated.id).select().single()
+      const { data, error: e } = await supabase.from('cues').update(toRow(updated)).eq('id', updated.id).select().single()
       if (e) return fail('Could not save cue', e)
       setCues((prev) => prev.map((c) => (c.id === updated.id ? rowToCue(data) : c)))
       return true
     },
-    [user.id]
+    [toRow]
+  )
+
+  // Saving a cue as aired; block a 2nd airing if the column isn't ready yet.
+  const saveAired = useCallback(
+    async (cue) => {
+      if (!hasAiringsRef.current && (cue.airings?.length || 0) > 1) {
+        window.alert(
+          'Storing more than one airing per cue needs the "airings" column added to the database first — this airing was not saved.'
+        )
+        return false
+      }
+      return updateCue(cue)
+    },
+    [updateCue]
+  )
+
+  const removeAiring = useCallback(
+    async (cue, airingId) => {
+      if (!window.confirm('Remove this airing?')) return
+      const airings = (cue.airings || []).filter((a) => a.id !== airingId)
+      // If that was the only airing, the cue is no longer "aired".
+      const updated = { ...cue, airings, status: airings.length ? 'aired' : 'accepted' }
+      return updateCue(updated)
+    },
+    [updateCue]
   )
 
   // ── CSV export / import ──
@@ -152,6 +194,14 @@ export default function Dashboard() {
         if (!title) continue // skip blank/trailing rows
         // If the file has no dedicated "Air Show" column, its "Show" column is
         // the broadcast show (as in the raw catalog export), so route it there.
+        const network = get('Network')
+        const airShow = get('Air Show') || get('Show')
+        const episode = get('Episode')
+        const airDate = get('First Air Date')
+        const airings =
+          network || airShow || episode || airDate
+            ? [{ id: newId(), network, show: airShow, episode, date: airDate }]
+            : []
         newCues.push({
           title,
           show: hasAirShow ? get('Show') : '',
@@ -169,10 +219,11 @@ export default function Dashboard() {
           musicalKey: get('Key'),
           bpm: get('BPM'),
           duration: get('Duration'),
-          airNetwork: get('Network'),
-          airShow: get('Air Show') || get('Show'),
-          airEpisode: get('Episode'),
-          firstAirDate: get('First Air Date'),
+          airings,
+          airNetwork: network,
+          airShow,
+          airEpisode: episode,
+          firstAirDate: airDate,
           pitchedTo: [],
         })
       }
@@ -180,7 +231,7 @@ export default function Dashboard() {
         window.alert('No rows with a Title found in that CSV.')
         return
       }
-      const { data, error: err } = await supabase.from('cues').insert(newCues.map((c) => cueToRow(c, user.id))).select()
+      const { data, error: err } = await supabase.from('cues').insert(newCues.map(toRow)).select()
       if (err) {
         fail('Import failed', err)
         return
@@ -265,7 +316,7 @@ export default function Dashboard() {
       )}
 
       {view === 'catalog' && (
-        <CatalogView cues={cues} onUpdate={updateCue} onEdit={(c) => setEditCue(c)} onAired={(c) => setAiredCue(c)} onAddPitch={(c) => setPitchCue(c)} />
+        <CatalogView cues={cues} onUpdate={updateCue} onEdit={(c) => setEditCue(c)} onAired={(c) => setAiredCue(c)} onAddPitch={(c) => setPitchCue(c)} onRemoveAiring={removeAiring} />
       )}
 
       {showAddCue && <AddCueModal batches={batches} onAdd={addCue} onAddBatch={addBatch} onClose={() => setShowAddCue(false)} />}
@@ -273,7 +324,7 @@ export default function Dashboard() {
       {rejectCue && <RejectModal cue={rejectCue} onReject={updateCue} onClose={() => setRejectCue(null)} />}
       {pitchCue && <AddPitchModal cue={pitchCue} onSave={updateCue} onClose={() => setPitchCue(null)} />}
       {editCue && <EditCueModal cue={editCue} batches={batches} onSave={updateCue} onAddBatch={addBatch} onClose={() => setEditCue(null)} />}
-      {airedCue && <AiredModal cue={airedCue} onSave={updateCue} onClose={() => setAiredCue(null)} />}
+      {airedCue && <AiredModal cue={airedCue} onSave={saveAired} onClose={() => setAiredCue(null)} />}
     </div>
   )
 }

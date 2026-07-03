@@ -44,10 +44,13 @@ export const CATALOG_STATUSES = ['accepted', 'aired', 'available']
 
 // ── Small helpers ──
 
-export function generatePitchId() {
+export function newId() {
   if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID()
-  return 'p_' + Math.random().toString(36).slice(2)
+  return 'id_' + Math.random().toString(36).slice(2)
 }
+
+// Kept for existing pitch code; same behavior as newId().
+export const generatePitchId = newId
 
 export function formatDate(d) {
   if (!d) return ''

@@ -25,6 +25,9 @@ export function rowToCue(row) {
     airShow: row.air_show || '',
     airEpisode: row.air_episode || '',
     firstAirDate: row.first_air_date || '',
+    // Multiple broadcasts per cue. If the row predates this column, synthesize
+    // one airing from the legacy single air_* fields so nothing is lost.
+    airings: airingsFromRow(row),
     musicalKey: row.musical_key || '',
     bpm: row.bpm ?? '',
     duration: row.duration || '',
@@ -35,10 +38,31 @@ export function rowToCue(row) {
   }
 }
 
+function airingsFromRow(row) {
+  if (Array.isArray(row.airings) && row.airings.length) return row.airings
+  const hasLegacy = row.air_network || row.air_show || row.air_episode || row.first_air_date
+  if (hasLegacy) {
+    return [
+      {
+        id: row.id + ':legacy',
+        network: row.air_network || '',
+        show: row.air_show || '',
+        episode: row.air_episode || '',
+        date: row.first_air_date || '',
+      },
+    ]
+  }
+  return []
+}
+
 // Build an insert/update payload. Empty strings become null so date/number
 // columns don't choke. `user_id` is stamped for Row Level Security.
 export function cueToRow(cue, userId) {
   const nn = (v) => (v === '' || v === undefined ? null : v)
+  // `airings` is the source of truth for broadcasts; keep the legacy single
+  // air_* columns synced to the first airing for CSV export / older readers.
+  const airings = Array.isArray(cue.airings) ? cue.airings : []
+  const first = airings[0] || null
   return {
     title: (cue.title || '').trim(),
     status: cue.status || 'need-to-start',
@@ -50,10 +74,11 @@ export function cueToRow(cue, userId) {
     tunesat: !!cue.tuneSat,
     ascap: !!cue.ascap,
     on_disco: !!cue.onDisco,
-    air_network: nn(cue.airNetwork),
-    air_show: nn(cue.airShow),
-    air_episode: nn(cue.airEpisode),
-    first_air_date: nn(cue.firstAirDate),
+    airings,
+    air_network: nn(first ? first.network : cue.airNetwork),
+    air_show: nn(first ? first.show : cue.airShow),
+    air_episode: nn(first ? first.episode : cue.airEpisode),
+    first_air_date: nn(first ? first.date : cue.firstAirDate),
     musical_key: nn(cue.musicalKey),
     // `bpm` is a text column, so keep it a string rather than coercing to a number.
     bpm: cue.bpm === '' || cue.bpm == null ? null : String(cue.bpm),

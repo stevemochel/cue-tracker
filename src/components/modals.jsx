@@ -7,6 +7,7 @@ import {
   formatDate,
   today,
   generatePitchId,
+  newId,
 } from '../lib/constants'
 
 // ─── Add Cue Modal ───
@@ -190,16 +191,22 @@ export function AcceptModal({ cue, onAccept, onClose }) {
 }
 
 // ─── Aired Modal ───
+// Logs one broadcast. Used both to first mark a cue as aired and to add
+// additional airings later — each call appends to the cue's `airings` list.
 export function AiredModal({ cue, onSave, onClose }) {
-  const [airNetwork, setAirNetwork] = useState(cue.airNetwork || '')
-  const [airShow, setAirShow] = useState(cue.airShow || '')
-  const [airEpisode, setAirEpisode] = useState(cue.airEpisode || '')
-  const [firstAirDate, setFirstAirDate] = useState(cue.firstAirDate || today())
+  const [network, setNetwork] = useState('')
+  const [show, setShow] = useState('')
+  const [episode, setEpisode] = useState('')
+  const [date, setDate] = useState(today())
   const [saving, setSaving] = useState(false)
+
+  const existing = Array.isArray(cue.airings) ? cue.airings : []
+  const isAdditional = cue.status === 'aired' && existing.length > 0
 
   const handle = async () => {
     setSaving(true)
-    const ok = await onSave({ ...cue, status: 'aired', airNetwork, airShow, airEpisode, firstAirDate })
+    const airing = { id: newId(), network, show, episode, date }
+    const ok = await onSave({ ...cue, status: 'aired', airings: [...existing, airing] })
     setSaving(false)
     if (ok) onClose()
   }
@@ -207,34 +214,38 @@ export function AiredModal({ cue, onSave, onClose }) {
   return (
     <div className="overlay" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-title">Mark as Aired</div>
+        <div className="modal-title">{isAdditional ? 'Add Another Airing' : 'Mark as Aired'}</div>
         <div style={{ fontSize: 14, color: 'var(--text-secondary)', marginBottom: 16 }}>
-          <strong style={{ color: 'var(--dark)' }}>{cue.title}</strong> — TuneSat detected a broadcast.
+          {isAdditional ? (
+            <>Logging another broadcast for <strong style={{ color: 'var(--dark)' }}>{cue.title}</strong> ({existing.length} already recorded).</>
+          ) : (
+            <><strong style={{ color: 'var(--dark)' }}>{cue.title}</strong> — TuneSat detected a broadcast.</>
+          )}
         </div>
         <div className="field-row">
           <div className="field">
             <label className="label">Network / Channel</label>
-            <input value={airNetwork} onChange={(e) => setAirNetwork(e.target.value)} placeholder="e.g. Bravo, Food Network" autoFocus />
+            <input value={network} onChange={(e) => setNetwork(e.target.value)} placeholder="e.g. Bravo, Food Network" autoFocus />
           </div>
           <div className="field">
-            <label className="label">First Air Date</label>
-            <input type="date" value={firstAirDate} onChange={(e) => setFirstAirDate(e.target.value)} />
+            <label className="label">Air Date</label>
+            <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
           </div>
         </div>
         <div className="field-row">
           <div className="field">
             <label className="label">Show</label>
-            <input value={airShow} onChange={(e) => setAirShow(e.target.value)} placeholder="e.g. Below Deck Mediterranean" />
+            <input value={show} onChange={(e) => setShow(e.target.value)} placeholder="e.g. Below Deck Mediterranean" />
           </div>
           <div className="field">
             <label className="label">Episode</label>
-            <input value={airEpisode} onChange={(e) => setAirEpisode(e.target.value)} placeholder="e.g. Bubble Trouble (S10 E4)" />
+            <input value={episode} onChange={(e) => setEpisode(e.target.value)} placeholder="e.g. Bubble Trouble (S10 E4)" />
           </div>
         </div>
         <div className="modal-footer">
           <button className="btn btn-ghost" onClick={onClose}>Cancel</button>
-          <button className="btn btn-primary" disabled={!airNetwork || saving} style={{ opacity: airNetwork && !saving ? 1 : 0.4 }} onClick={handle}>
-            {saving ? 'Saving…' : 'Mark as Aired'}
+          <button className="btn btn-primary" disabled={!network || saving} style={{ opacity: network && !saving ? 1 : 0.4 }} onClick={handle}>
+            {saving ? 'Saving…' : isAdditional ? 'Add Airing' : 'Mark as Aired'}
           </button>
         </div>
       </div>
@@ -343,10 +354,13 @@ export function EditCueModal({ cue, batches, onSave, onAddBatch, onClose }) {
   const [musicalKey, setMusicalKey] = useState(cue.musicalKey || '')
   const [bpm, setBpm] = useState(cue.bpm || '')
   const [duration, setDuration] = useState(cue.duration || '')
-  const [airNetwork, setAirNetwork] = useState(cue.airNetwork || '')
-  const [airShow, setAirShow] = useState(cue.airShow || '')
-  const [airEpisode, setAirEpisode] = useState(cue.airEpisode || '')
-  const [firstAirDate, setFirstAirDate] = useState(cue.firstAirDate || '')
+  // These fields edit the FIRST airing; any additional airings are preserved.
+  const existingAirings = Array.isArray(cue.airings) ? cue.airings : []
+  const firstAiring = existingAirings[0] || null
+  const [airNetwork, setAirNetwork] = useState(firstAiring ? firstAiring.network : cue.airNetwork || '')
+  const [airShow, setAirShow] = useState(firstAiring ? firstAiring.show : cue.airShow || '')
+  const [airEpisode, setAirEpisode] = useState(firstAiring ? firstAiring.episode : cue.airEpisode || '')
+  const [firstAirDate, setFirstAirDate] = useState(firstAiring ? firstAiring.date : cue.firstAirDate || '')
   const [creatingBatch, setCreatingBatch] = useState(false)
   const [newBatchName, setNewBatchName] = useState(`Batch ${String(batches.length + 1).padStart(2, '0')}`)
   const [newBatchSignUp, setNewBatchSignUp] = useState('')
@@ -377,10 +391,16 @@ export function EditCueModal({ cue, batches, onSave, onAddBatch, onClose }) {
 
   const handleSave = async () => {
     setSaving(true)
+    // Rebuild the airings list: edited first airing + any others untouched.
+    const rest = existingAirings.slice(1)
+    const hasFirst = airNetwork || airShow || airEpisode || firstAirDate
+    const airings = hasFirst
+      ? [{ id: firstAiring ? firstAiring.id : newId(), network: airNetwork, show: airShow, episode: airEpisode, date: firstAirDate }, ...rest]
+      : rest
     const ok = await onSave({
       ...cue, title: title.trim(), show, batchId: batchId || null, genre, notes, dueDate,
       publisher, exclusivity, placement, tuneSat, ascap, onDisco, musicalKey, bpm, duration,
-      airNetwork, airShow, airEpisode, firstAirDate,
+      airings, airNetwork, airShow, airEpisode, firstAirDate,
     })
     setSaving(false)
     if (ok) onClose()
@@ -466,15 +486,22 @@ export function EditCueModal({ cue, batches, onSave, onAddBatch, onClose }) {
 
         {isAired && (
           <>
-            <div className="modal-section">Air Info</div>
+            <div className="modal-section">
+              {existingAirings.length > 1 ? 'First Airing' : 'Air Info'}
+            </div>
             <div className="field-row">
               <div className="field"><label className="label">Network</label><input value={airNetwork} onChange={(e) => setAirNetwork(e.target.value)} placeholder="e.g. Bravo" /></div>
-              <div className="field"><label className="label">First Air Date</label><input type="date" value={firstAirDate} onChange={(e) => setFirstAirDate(e.target.value)} /></div>
+              <div className="field"><label className="label">Air Date</label><input type="date" value={firstAirDate} onChange={(e) => setFirstAirDate(e.target.value)} /></div>
             </div>
             <div className="field-row">
               <div className="field"><label className="label">Show</label><input value={airShow} onChange={(e) => setAirShow(e.target.value)} /></div>
               <div className="field"><label className="label">Episode</label><input value={airEpisode} onChange={(e) => setAirEpisode(e.target.value)} /></div>
             </div>
+            {existingAirings.length > 1 && (
+              <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 4 }}>
+                +{existingAirings.length - 1} more airing{existingAirings.length - 1 === 1 ? '' : 's'} — add or remove them in the Aired tab.
+              </div>
+            )}
           </>
         )}
 
