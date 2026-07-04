@@ -3,9 +3,10 @@ import { useAuth } from './context/AuthContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
+import UpdatePassword from './pages/UpdatePassword'
 
 export default function App() {
-  const { loading } = useAuth()
+  const { loading, recovery } = useAuth()
 
   if (loading) {
     return (
@@ -13,6 +14,11 @@ export default function App() {
         <div className="spinner" />
       </div>
     )
+  }
+
+  // A password-reset link takes priority over everything else.
+  if (recovery) {
+    return <UpdatePassword />
   }
 
   return (

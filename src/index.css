@@ -702,6 +702,22 @@ tr:hover td {
 .auth-form .field {
   margin-bottom: 0;
 }
+.auth-footer {
+  margin-top: 16px;
+  text-align: center;
+}
+.auth-link {
+  background: none;
+  border: none;
+  color: var(--blue);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px;
+}
+.auth-link:hover {
+  text-decoration: underline;
+}
 
 /* Loading spinner */
 .app-loading {
