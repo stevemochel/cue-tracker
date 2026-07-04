@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { formatDate } from '../lib/constants'
+import AudioControls from './AudioControls'
 
 // ─── Catalog View ───
-export default function CatalogView({ cues, onUpdate, onEdit, onAired, onAddPitch, onRemoveAiring }) {
+export default function CatalogView({ cues, onUpdate, onEdit, onAired, onAddPitch, onRemoveAiring, userId, audioEnabled, onSaveAudio }) {
   const [tab, setTab] = useState('all')
   const [sortKey, setSortKey] = useState(null)
   const [sortDir, setSortDir] = useState('asc')
@@ -86,6 +87,16 @@ export default function CatalogView({ cues, onUpdate, onEdit, onAired, onAddPitc
 
   const switchTab = (t) => { setTab(t); setSortKey(null); setSortDir('asc') }
 
+  // Audio column (only when the storage feature is available). onClick guard so
+  // upload/play buttons don't trigger the row's edit-on-click.
+  const audioHeader = audioEnabled ? <th style={{ width: 210 }}>Audio</th> : null
+  const audioCell = (cue) =>
+    audioEnabled ? (
+      <td onClick={(e) => e.stopPropagation()}>
+        <AudioControls compact cue={cue} userId={userId} onChange={(p) => onSaveAudio(cue, p)} />
+      </td>
+    ) : null
+
   return (
     <div>
       <div className="catalog-tabs">
@@ -111,6 +122,7 @@ export default function CatalogView({ cues, onUpdate, onEdit, onAired, onAddPitc
                   <SortTh field="tuneSat">TuneSat</SortTh>
                   <SortTh field="ascap">ASCAP</SortTh>
                   <SortTh field="onDisco">On Disco</SortTh>
+                  {audioHeader}
                 </tr>
               </thead>
               <tbody>
@@ -128,6 +140,7 @@ export default function CatalogView({ cues, onUpdate, onEdit, onAired, onAddPitc
                       <td><button className={`check-btn ${cue.tuneSat ? 'checked' : ''}`} onClick={() => toggleField(cue, 'tuneSat')}>{cue.tuneSat ? '✓' : ''}</button></td>
                       <td><button className={`check-btn ${cue.ascap ? 'checked' : ''}`} onClick={() => toggleField(cue, 'ascap')}>{cue.ascap ? '✓' : ''}</button></td>
                       <td><button className={`check-btn ${cue.onDisco ? 'checked' : ''}`} onClick={() => toggleField(cue, 'onDisco')}>{cue.onDisco ? '✓' : ''}</button></td>
+                      {audioCell(cue)}
                     </tr>
                   )
                 })}
@@ -152,6 +165,7 @@ export default function CatalogView({ cues, onUpdate, onEdit, onAired, onAddPitc
                   <SortTh field="ascap">ASCAP</SortTh>
                   <SortTh field="onDisco">On Disco</SortTh>
                   <th>Notes</th>
+                  {audioHeader}
                   <th style={{ width: 90 }}></th>
                 </tr>
               </thead>
@@ -166,6 +180,7 @@ export default function CatalogView({ cues, onUpdate, onEdit, onAired, onAddPitc
                     <td><button className={`check-btn ${cue.ascap ? 'checked' : ''}`} onClick={() => toggleField(cue, 'ascap')}>{cue.ascap ? '✓' : ''}</button></td>
                     <td><button className={`check-btn ${cue.onDisco ? 'checked' : ''}`} onClick={() => toggleField(cue, 'onDisco')}>{cue.onDisco ? '✓' : ''}</button></td>
                     <td style={{ color: 'var(--text-secondary)', maxWidth: 140, fontSize: 12 }}>{cue.notes}</td>
+                    {audioCell(cue)}
                     <td><button className="btn btn-green btn-sm" onClick={() => onAired(cue)}>📡 Aired</button></td>
                   </tr>
                 ))}
@@ -191,6 +206,7 @@ export default function CatalogView({ cues, onUpdate, onEdit, onAired, onAddPitc
                   <SortTh field="tuneSat">TuneSat</SortTh>
                   <SortTh field="ascap">ASCAP</SortTh>
                   <SortTh field="onDisco">On Disco</SortTh>
+                  {audioHeader}
                   <th style={{ width: 120 }}></th>
                 </tr>
               </thead>
@@ -206,6 +222,7 @@ export default function CatalogView({ cues, onUpdate, onEdit, onAired, onAddPitc
                     <td><button className={`check-btn ${cue.tuneSat ? 'checked' : ''}`} onClick={() => toggleField(cue, 'tuneSat')}>{cue.tuneSat ? '✓' : ''}</button></td>
                     <td><button className={`check-btn ${cue.ascap ? 'checked' : ''}`} onClick={() => toggleField(cue, 'ascap')}>{cue.ascap ? '✓' : ''}</button></td>
                     <td><button className={`check-btn ${cue.onDisco ? 'checked' : ''}`} onClick={() => toggleField(cue, 'onDisco')}>{cue.onDisco ? '✓' : ''}</button></td>
+                    {audioCell(cue)}
                     <td style={{ whiteSpace: 'nowrap', textAlign: 'right' }}>
                       <button className="btn btn-outline btn-sm" onClick={() => onAired(cue)} title="Add another airing">+ Airing</button>
                       {airing && onRemoveAiring && (
@@ -234,6 +251,7 @@ export default function CatalogView({ cues, onUpdate, onEdit, onAired, onAddPitc
                   <SortTh field="bpm">BPM</SortTh>
                   <SortTh field="duration">Duration</SortTh>
                   <th>Pitched To</th>
+                  {audioHeader}
                   <th style={{ width: 80 }}></th>
                 </tr>
               </thead>
@@ -255,6 +273,7 @@ export default function CatalogView({ cues, onUpdate, onEdit, onAired, onAddPitc
                         <span style={{ color: 'var(--text-muted)', fontSize: 12 }}>Not pitched yet</span>
                       )}
                     </td>
+                    {audioCell(cue)}
                     <td><button className="btn btn-outline btn-sm" onClick={() => onAddPitch(cue)}>+ Pitch</button></td>
                   </tr>
                 ))}

@@ -9,6 +9,7 @@ import {
   generatePitchId,
   newId,
 } from '../lib/constants'
+import AudioControls from './AudioControls'
 
 // ─── Add Cue Modal ───
 export function AddCueModal({ batches, onAdd, onAddBatch, onClose }) {
@@ -338,7 +339,7 @@ export function AddPitchModal({ cue, onSave, onClose }) {
 }
 
 // ─── Edit Cue Modal ───
-export function EditCueModal({ cue, batches, onSave, onAddBatch, onClose }) {
+export function EditCueModal({ cue, batches, onSave, onAddBatch, onClose, userId, audioEnabled, onSaveAudio }) {
   const [title, setTitle] = useState(cue.title)
   const [show, setShow] = useState(cue.show)
   const [batchId, setBatchId] = useState(cue.batchId || '')
@@ -361,6 +362,7 @@ export function EditCueModal({ cue, batches, onSave, onAddBatch, onClose }) {
   const [airShow, setAirShow] = useState(firstAiring ? firstAiring.show : cue.airShow || '')
   const [airEpisode, setAirEpisode] = useState(firstAiring ? firstAiring.episode : cue.airEpisode || '')
   const [firstAirDate, setFirstAirDate] = useState(firstAiring ? firstAiring.date : cue.firstAirDate || '')
+  const [audioPath, setAudioPath] = useState(cue.audioPath || '')
   const [creatingBatch, setCreatingBatch] = useState(false)
   const [newBatchName, setNewBatchName] = useState(`Batch ${String(batches.length + 1).padStart(2, '0')}`)
   const [newBatchSignUp, setNewBatchSignUp] = useState('')
@@ -400,7 +402,7 @@ export function EditCueModal({ cue, batches, onSave, onAddBatch, onClose }) {
     const ok = await onSave({
       ...cue, title: title.trim(), show, batchId: batchId || null, genre, notes, dueDate,
       publisher, exclusivity, placement, tuneSat, ascap, onDisco, musicalKey, bpm, duration,
-      airings, airNetwork, airShow, airEpisode, firstAirDate,
+      airings, airNetwork, airShow, airEpisode, firstAirDate, audioPath,
     })
     setSaving(false)
     if (ok) onClose()
@@ -449,6 +451,13 @@ export function EditCueModal({ cue, batches, onSave, onAddBatch, onClose }) {
           <div className="field"><label className="label">Genre / Style</label><input value={genre} onChange={(e) => setGenre(e.target.value)} /></div>
         </div>
         <div className="field"><label className="label">Notes</label><textarea style={{ height: 56, resize: 'vertical' }} value={notes} onChange={(e) => setNotes(e.target.value)} /></div>
+
+        {audioEnabled && userId && (
+          <>
+            <div className="modal-section">Audio</div>
+            <AudioControls cue={cue} userId={userId} onChange={(p) => { setAudioPath(p); onSaveAudio && onSaveAudio(cue, p) }} />
+          </>
+        )}
 
         {isCatalog && (
           <>

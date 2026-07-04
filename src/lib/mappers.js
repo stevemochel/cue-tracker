@@ -35,6 +35,7 @@ export function rowToCue(row) {
     notes: row.notes || '',
     dueDate: row.due_date || '',
     batchId: row.batch_id || null,
+    audioPath: row.audio_path || '',
   }
 }
 
@@ -87,6 +88,7 @@ export function cueToRow(cue, userId) {
     notes: nn(cue.notes),
     due_date: nn(cue.dueDate),
     batch_id: cue.batchId || null,
+    audio_path: nn(cue.audioPath),
     user_id: userId,
   }
 }

@@ -32,15 +32,18 @@ export default function Dashboard() {
   const [editCue, setEditCue] = useState(null)
   const [airedCue, setAiredCue] = useState(null)
 
-  // Whether the DB has the `airings` column yet. If not (older schema), we omit
-  // it from writes so nothing errors, and fall back to the single air_* columns.
-  const hasAiringsRef = useRef(true)
+  // Which optional columns the DB has yet. Missing ones are dropped from writes
+  // so nothing errors on an older schema. Ref for fresh reads inside callbacks;
+  // `audioEnabled` state drives whether the upload UI is shown.
+  const capsRef = useRef({ airings: true, audio: true })
+  const [audioEnabled, setAudioEnabled] = useState(false)
 
-  // Build a DB payload, dropping `airings` if the column isn't present yet.
+  // Build a DB payload, dropping columns the DB doesn't have yet.
   const toRow = useCallback(
     (cue) => {
       const row = cueToRow(cue, user.id)
-      if (!hasAiringsRef.current) delete row.airings
+      if (!capsRef.current.airings) delete row.airings
+      if (!capsRef.current.audio) delete row.audio_path
       return row
     },
     [user.id]
@@ -51,9 +54,15 @@ export default function Dashboard() {
     let active = true
     ;(async () => {
       setLoading(true)
-      // Detect the `airings` column (errors only if it doesn't exist).
-      const probe = await supabase.from('cues').select('airings').limit(1)
-      if (active) hasAiringsRef.current = !probe.error
+      // Detect optional columns (each errors only if it doesn't exist).
+      const [airProbe, audProbe] = await Promise.all([
+        supabase.from('cues').select('airings').limit(1),
+        supabase.from('cues').select('audio_path').limit(1),
+      ])
+      if (active) {
+        capsRef.current = { airings: !airProbe.error, audio: !audProbe.error }
+        setAudioEnabled(!audProbe.error)
+      }
       const [cuesRes, batchesRes] = await Promise.all([
         supabase.from('cues').select('*').order('created_at', { ascending: true }),
         supabase.from('batches').select('*'),
@@ -129,10 +138,13 @@ export default function Dashboard() {
     [toRow]
   )
 
+  // Persist a cue's audio file path (upload/remove happens in AudioControls).
+  const saveAudio = useCallback((cue, path) => updateCue({ ...cue, audioPath: path }), [updateCue])
+
   // Saving a cue as aired; block a 2nd airing if the column isn't ready yet.
   const saveAired = useCallback(
     async (cue) => {
-      if (!hasAiringsRef.current && (cue.airings?.length || 0) > 1) {
+      if (!capsRef.current.airings && (cue.airings?.length || 0) > 1) {
         window.alert(
           'Storing more than one airing per cue needs the "airings" column added to the database first — this airing was not saved.'
         )
@@ -316,14 +328,14 @@ export default function Dashboard() {
       )}
 
       {view === 'catalog' && (
-        <CatalogView cues={cues} onUpdate={updateCue} onEdit={(c) => setEditCue(c)} onAired={(c) => setAiredCue(c)} onAddPitch={(c) => setPitchCue(c)} onRemoveAiring={removeAiring} />
+        <CatalogView cues={cues} onUpdate={updateCue} onEdit={(c) => setEditCue(c)} onAired={(c) => setAiredCue(c)} onAddPitch={(c) => setPitchCue(c)} onRemoveAiring={removeAiring} userId={user.id} audioEnabled={audioEnabled} onSaveAudio={saveAudio} />
       )}
 
       {showAddCue && <AddCueModal batches={batches} onAdd={addCue} onAddBatch={addBatch} onClose={() => setShowAddCue(false)} />}
       {acceptCue && <AcceptModal cue={acceptCue} onAccept={updateCue} onClose={() => setAcceptCue(null)} />}
       {rejectCue && <RejectModal cue={rejectCue} onReject={updateCue} onClose={() => setRejectCue(null)} />}
       {pitchCue && <AddPitchModal cue={pitchCue} onSave={updateCue} onClose={() => setPitchCue(null)} />}
-      {editCue && <EditCueModal cue={editCue} batches={batches} onSave={updateCue} onAddBatch={addBatch} onClose={() => setEditCue(null)} />}
+      {editCue && <EditCueModal cue={editCue} batches={batches} onSave={updateCue} onAddBatch={addBatch} onClose={() => setEditCue(null)} userId={user.id} audioEnabled={audioEnabled} onSaveAudio={saveAudio} />}
       {airedCue && <AiredModal cue={airedCue} onSave={saveAired} onClose={() => setAiredCue(null)} />}
     </div>
   )
