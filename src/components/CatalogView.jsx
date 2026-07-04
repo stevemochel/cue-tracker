@@ -1,9 +1,9 @@
 import { useState } from 'react'
-import { formatDate } from '../lib/constants'
+import { formatDate, money } from '../lib/constants'
 import AudioControls from './AudioControls'
 
 // ─── Catalog View ───
-export default function CatalogView({ cues, onUpdate, onEdit, onAired, onAddPitch, onRemoveAiring, userId, audioEnabled, onSaveAudio }) {
+export default function CatalogView({ cues, onUpdate, onEdit, onAired, onAddPitch, onRemoveAiring, userId, audioEnabled, onSaveAudio, earnedByCue = {}, royaltiesEnabled }) {
   const [tab, setTab] = useState('all')
   const [sortKey, setSortKey] = useState(null)
   const [sortDir, setSortDir] = useState('asc')
@@ -122,6 +122,7 @@ export default function CatalogView({ cues, onUpdate, onEdit, onAired, onAddPitc
                   <SortTh field="tuneSat">TuneSat</SortTh>
                   <SortTh field="ascap">ASCAP</SortTh>
                   <SortTh field="onDisco">On Disco</SortTh>
+                  {royaltiesEnabled && <th style={{ textAlign: 'right' }}>Earned</th>}
                   {audioHeader}
                 </tr>
               </thead>
@@ -140,6 +141,11 @@ export default function CatalogView({ cues, onUpdate, onEdit, onAired, onAddPitc
                       <td><button className={`check-btn ${cue.tuneSat ? 'checked' : ''}`} onClick={() => toggleField(cue, 'tuneSat')}>{cue.tuneSat ? '✓' : ''}</button></td>
                       <td><button className={`check-btn ${cue.ascap ? 'checked' : ''}`} onClick={() => toggleField(cue, 'ascap')}>{cue.ascap ? '✓' : ''}</button></td>
                       <td><button className={`check-btn ${cue.onDisco ? 'checked' : ''}`} onClick={() => toggleField(cue, 'onDisco')}>{cue.onDisco ? '✓' : ''}</button></td>
+                      {royaltiesEnabled && (
+                        <td style={{ textAlign: 'right', fontWeight: 600, color: earnedByCue[cue.id] ? 'var(--green)' : 'var(--text-muted)' }}>
+                          {earnedByCue[cue.id] ? money(earnedByCue[cue.id]) : '—'}
+                        </td>
+                      )}
                       {audioCell(cue)}
                     </tr>
                   )

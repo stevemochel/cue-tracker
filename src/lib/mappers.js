@@ -110,3 +110,37 @@ export function batchToRow(batch, userId) {
     user_id: userId,
   }
 }
+
+export function rowToRoyalty(row) {
+  return {
+    id: row.id,
+    cueId: row.cue_id || null,
+    source: row.source || '',
+    sourceType: row.source_type || '',
+    period: row.period || '',
+    periodSort: row.period_sort || '',
+    workTitle: row.work_title || '',
+    category: row.category || '',
+    plays: row.plays ?? null,
+    amount: Number(row.amount) || 0,
+    currency: row.currency || 'USD',
+    notes: row.notes || '',
+  }
+}
+
+export function royaltyToRow(r, userId) {
+  return {
+    cue_id: r.cueId || null,
+    source: (r.source || '').trim(),
+    source_type: r.sourceType || '',
+    period: r.period || '',
+    period_sort: r.periodSort || null,
+    work_title: r.workTitle || '',
+    category: r.category || '',
+    plays: r.plays === '' || r.plays == null ? null : Number(r.plays),
+    amount: r.amount === '' || r.amount == null ? 0 : Number(r.amount),
+    currency: r.currency || 'USD',
+    notes: r.notes || '',
+    user_id: userId,
+  }
+}

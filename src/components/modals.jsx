@@ -8,6 +8,7 @@ import {
   today,
   generatePitchId,
   newId,
+  money,
 } from '../lib/constants'
 import AudioControls from './AudioControls'
 
@@ -339,7 +340,7 @@ export function AddPitchModal({ cue, onSave, onClose }) {
 }
 
 // ─── Edit Cue Modal ───
-export function EditCueModal({ cue, batches, onSave, onAddBatch, onClose, userId, audioEnabled, onSaveAudio }) {
+export function EditCueModal({ cue, batches, onSave, onAddBatch, onClose, userId, audioEnabled, onSaveAudio, earned = 0, royaltiesEnabled }) {
   const [title, setTitle] = useState(cue.title)
   const [show, setShow] = useState(cue.show)
   const [batchId, setBatchId] = useState(cue.batchId || '')
@@ -457,6 +458,12 @@ export function EditCueModal({ cue, batches, onSave, onAddBatch, onClose, userId
             <div className="modal-section">Audio</div>
             <AudioControls cue={cue} userId={userId} onChange={(p) => { setAudioPath(p); onSaveAudio && onSaveAudio(cue, p) }} />
           </>
+        )}
+
+        {royaltiesEnabled && (
+          <div style={{ marginTop: 16, fontSize: 13, color: 'var(--text-secondary)' }}>
+            Royalties earned: <strong style={{ color: 'var(--green)' }}>{money(earned)}</strong>
+          </div>
         )}
 
         {isCatalog && (

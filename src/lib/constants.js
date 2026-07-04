@@ -65,6 +65,26 @@ export function today() {
   return new Date().toISOString().split('T')[0]
 }
 
+// Turn a statement period like "2025 Q4" into a sortable date (first day of the
+// quarter). Falls back to Jan 1 of any 4-digit year found, else null.
+export function periodToDate(period) {
+  const q = /(\d{4})\s*Q\s*([1-4])/i.exec(period || '')
+  if (q) return `${q[1]}-${String((Number(q[2]) - 1) * 3 + 1).padStart(2, '0')}-01`
+  const y = /(20\d{2})/.exec(period || '')
+  return y ? `${y[1]}-01-01` : null
+}
+
+// Currency formatter that keeps precision for tiny streaming micro-amounts.
+export function money(n) {
+  const v = Number(n) || 0
+  return v.toLocaleString('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: Math.abs(v) < 1 && v !== 0 ? 4 : 2,
+  })
+}
+
 // Parse CSV text into an array of row arrays. Handles quoted fields that
 // contain commas, escaped double-quotes (""), and CR/LF line endings —
 // which a naive split(',') / split('\n') gets wrong.

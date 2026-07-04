@@ -1,11 +1,12 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
-import { rowToCue, cueToRow, rowToBatch, batchToRow } from '../lib/mappers'
+import { rowToCue, cueToRow, rowToBatch, batchToRow, rowToRoyalty, royaltyToRow } from '../lib/mappers'
 import { PIPELINE_STATUSES, today, parseCsv, newId } from '../lib/constants'
 import StatsBar from '../components/StatsBar'
 import PipelineView from '../components/PipelineView'
 import CatalogView from '../components/CatalogView'
+import RoyaltiesView from '../components/RoyaltiesView'
 import {
   AddCueModal,
   EditCueModal,
@@ -20,6 +21,8 @@ export default function Dashboard() {
 
   const [cues, setCues] = useState([])
   const [batches, setBatches] = useState([])
+  const [royalties, setRoyalties] = useState([])
+  const [royaltiesEnabled, setRoyaltiesEnabled] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
@@ -78,6 +81,13 @@ export default function Dashboard() {
       }
       if (batchesRes.error) setError((e) => e || batchesRes.error.message)
       else setBatches(batchesRes.data.map(rowToBatch))
+
+      // Royalties are optional — the table may not exist on an older schema.
+      const royRes = await supabase.from('royalty_entries').select('*')
+      if (active && !royRes.error) {
+        setRoyalties(royRes.data.map(rowToRoyalty))
+        setRoyaltiesEnabled(true)
+      }
       setLoading(false)
     })()
     return () => {
@@ -140,6 +150,47 @@ export default function Dashboard() {
 
   // Persist a cue's audio file path (upload/remove happens in AudioControls).
   const saveAudio = useCallback((cue, path) => updateCue({ ...cue, audioPath: path }), [updateCue])
+
+  // ── Royalties ──
+  const addRoyalty = useCallback(
+    async (entry) => {
+      const { data, error: e } = await supabase.from('royalty_entries').insert(royaltyToRow(entry, user.id)).select().single()
+      if (e) return fail('Could not add royalty entry', e)
+      setRoyalties((prev) => [...prev, rowToRoyalty(data)])
+      return true
+    },
+    [user.id]
+  )
+
+  const deleteRoyalty = useCallback(async (id) => {
+    if (!window.confirm('Delete this royalty entry?')) return
+    const { error: e } = await supabase.from('royalty_entries').delete().eq('id', id)
+    if (e) return fail('Could not delete royalty entry', e)
+    setRoyalties((prev) => prev.filter((r) => r.id !== id))
+    return true
+  }, [])
+
+  const importRoyalties = useCallback(
+    async (entries) => {
+      const { data, error: e } = await supabase.from('royalty_entries').insert(entries.map((r) => royaltyToRow(r, user.id))).select()
+      if (e) {
+        fail('Royalty import failed', e)
+        return null
+      }
+      setRoyalties((prev) => [...prev, ...data.map(rowToRoyalty)])
+      return data.length
+    },
+    [user.id]
+  )
+
+  // Total earned per cue, for the per-cue "earned" figures.
+  const earnedByCue = useMemo(() => {
+    const m = {}
+    royalties.forEach((r) => {
+      if (r.cueId) m[r.cueId] = (m[r.cueId] || 0) + (r.amount || 0)
+    })
+    return m
+  }, [royalties])
 
   // Saving a cue as aired; block a 2nd airing if the column isn't ready yet.
   const saveAired = useCallback(
@@ -303,6 +354,11 @@ export default function Dashboard() {
         <button className={`nav-btn ${view === 'catalog' ? 'active' : ''}`} onClick={() => setView('catalog')}>
           Catalog {catalogCount > 0 && <span className="badge" style={{ background: 'var(--blue)' }}>{catalogCount}</span>}
         </button>
+        {royaltiesEnabled && (
+          <button className={`nav-btn ${view === 'royalties' ? 'active' : ''}`} onClick={() => setView('royalties')}>
+            Royalties {royalties.length > 0 && <span className="badge" style={{ background: 'var(--green)' }}>{royalties.length}</span>}
+          </button>
+        )}
       </div>
 
       {view === 'pipeline' && (
@@ -328,14 +384,18 @@ export default function Dashboard() {
       )}
 
       {view === 'catalog' && (
-        <CatalogView cues={cues} onUpdate={updateCue} onEdit={(c) => setEditCue(c)} onAired={(c) => setAiredCue(c)} onAddPitch={(c) => setPitchCue(c)} onRemoveAiring={removeAiring} userId={user.id} audioEnabled={audioEnabled} onSaveAudio={saveAudio} />
+        <CatalogView cues={cues} onUpdate={updateCue} onEdit={(c) => setEditCue(c)} onAired={(c) => setAiredCue(c)} onAddPitch={(c) => setPitchCue(c)} onRemoveAiring={removeAiring} userId={user.id} audioEnabled={audioEnabled} onSaveAudio={saveAudio} earnedByCue={earnedByCue} royaltiesEnabled={royaltiesEnabled} />
+      )}
+
+      {view === 'royalties' && royaltiesEnabled && (
+        <RoyaltiesView royalties={royalties} cues={cues} onImport={importRoyalties} onAdd={addRoyalty} onDelete={deleteRoyalty} />
       )}
 
       {showAddCue && <AddCueModal batches={batches} onAdd={addCue} onAddBatch={addBatch} onClose={() => setShowAddCue(false)} />}
       {acceptCue && <AcceptModal cue={acceptCue} onAccept={updateCue} onClose={() => setAcceptCue(null)} />}
       {rejectCue && <RejectModal cue={rejectCue} onReject={updateCue} onClose={() => setRejectCue(null)} />}
       {pitchCue && <AddPitchModal cue={pitchCue} onSave={updateCue} onClose={() => setPitchCue(null)} />}
-      {editCue && <EditCueModal cue={editCue} batches={batches} onSave={updateCue} onAddBatch={addBatch} onClose={() => setEditCue(null)} userId={user.id} audioEnabled={audioEnabled} onSaveAudio={saveAudio} />}
+      {editCue && <EditCueModal cue={editCue} batches={batches} onSave={updateCue} onAddBatch={addBatch} onClose={() => setEditCue(null)} userId={user.id} audioEnabled={audioEnabled} onSaveAudio={saveAudio} earned={earnedByCue[editCue.id] || 0} royaltiesEnabled={royaltiesEnabled} />}
       {airedCue && <AiredModal cue={airedCue} onSave={saveAired} onClose={() => setAiredCue(null)} />}
     </div>
   )
