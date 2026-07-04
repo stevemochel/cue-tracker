@@ -1,4 +1,4 @@
-# Cue Tracker — Library Music Pipeline
+# Placed — From Pitched to Placed
 
 A React + Vite app for library-music composers to move cues through a **pipeline**
 (Need to Start → In Progress → Delivered) and into a **catalog** (Accepted → Aired,

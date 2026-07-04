@@ -1,4 +1,4 @@
-// ── Domain constants (ported from the original Cue Tracker build) ──
+// ── Domain constants (ported from the original build) ──
 
 export const SHOWS = ['Below Deck', 'The Challenge', 'Ad-Hoc Brief']
 

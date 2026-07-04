@@ -1,4 +1,4 @@
-# Netlify configuration for the Cue Tracker (Vite single-page app).
+# Netlify configuration for Placed (Vite single-page app).
 
 [build]
   command = "npm run build"
