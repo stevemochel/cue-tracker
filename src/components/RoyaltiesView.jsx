@@ -243,9 +243,33 @@ export default function RoyaltiesView({ royalties, cues, onImport, onAdd, onDele
           plays: a.plays,
           amount: a.amount.toFixed(5),
         }))
+      } else if (has('song_name') && has('amount')) {
+        // Raw Songtrust statement: aggregate per song / period / royalty group.
+        const agg = {}
+        for (const r of body) {
+          const song = cell(r, 'song_name')
+          if (!song) continue
+          const period = cell(r, 'period')
+          const group = /^mechanical/i.test(cell(r, 'royalty_type')) ? 'Mechanical' : 'Performance'
+          const key = song + '|' + period + '|' + group
+          agg[key] = agg[key] || { song, period, group, amount: 0, plays: 0 }
+          agg[key].amount += parseAmount(cell(r, 'amount'))
+          agg[key].plays += parseInt(cell(r, 'units') || '0', 10) || 0
+        }
+        entries = Object.values(agg).map((a) => ({
+          source: 'Songtrust',
+          sourceType: 'Publishing',
+          period: a.period,
+          periodSort: periodToDate(a.period),
+          workTitle: a.song,
+          cueId: matchCueId(a.song),
+          category: a.group,
+          plays: a.plays,
+          amount: a.amount.toFixed(5),
+        }))
       } else {
         window.alert(
-          'Unrecognized CSV. Upload an ASCAP or LANDR statement export, or the app’s royalty-import format.'
+          'Unrecognized CSV. Upload an ASCAP, LANDR, or Songtrust statement export, or the app’s royalty-import format.'
         )
         return
       }
