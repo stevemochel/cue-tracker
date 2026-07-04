@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
 import { rowToCue, cueToRow, rowToBatch, batchToRow, rowToRoyalty, royaltyToRow } from '../lib/mappers'
-import { PIPELINE_STATUSES, today, parseCsv, newId } from '../lib/constants'
+import { PIPELINE_STATUSES, today, parseCsv, newId, SHOWS, PUBLISHERS } from '../lib/constants'
 import StatsBar from '../components/StatsBar'
 import PipelineView from '../components/PipelineView'
 import CatalogView from '../components/CatalogView'
@@ -23,6 +23,8 @@ export default function Dashboard() {
   const [batches, setBatches] = useState([])
   const [royalties, setRoyalties] = useState([])
   const [royaltiesEnabled, setRoyaltiesEnabled] = useState(false)
+  const [listOptions, setListOptions] = useState([]) // {kind, value}
+  const [optionsEnabled, setOptionsEnabled] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
@@ -87,6 +89,13 @@ export default function Dashboard() {
       if (active && !royRes.error) {
         setRoyalties(royRes.data.map(rowToRoyalty))
         setRoyaltiesEnabled(true)
+      }
+
+      // Custom show/publisher options (optional table).
+      const optRes = await supabase.from('list_options').select('kind, value')
+      if (active && !optRes.error) {
+        setListOptions(optRes.data)
+        setOptionsEnabled(true)
       }
       setLoading(false)
     })()
@@ -182,6 +191,31 @@ export default function Dashboard() {
     },
     [user.id]
   )
+
+  // ── Custom show / publisher options ──
+  const addOption = useCallback(
+    async (kind, value) => {
+      const v = (value || '').trim()
+      if (!v) return false
+      // Skip the insert if we already know this value (avoids a dup-key error).
+      if (listOptions.some((o) => o.kind === kind && o.value.toLowerCase() === v.toLowerCase())) return true
+      const { error: e } = await supabase.from('list_options').insert({ user_id: user.id, kind, value: v })
+      if (e && e.code !== '23505') return fail('Could not add option', e) // 23505 = unique violation
+      setListOptions((prev) => [...prev, { kind, value: v }])
+      return true
+    },
+    [user.id, listOptions]
+  )
+
+  const optionList = (kind, defaults) =>
+    [...new Set([
+      ...defaults,
+      ...listOptions.filter((o) => o.kind === kind).map((o) => o.value),
+      ...cues.map((c) => (kind === 'show' ? c.show : c.publisher)).filter(Boolean),
+    ])]
+
+  const showOptions = useMemo(() => optionList('show', SHOWS), [listOptions, cues])
+  const publisherOptions = useMemo(() => optionList('publisher', PUBLISHERS), [listOptions, cues])
 
   // Total earned per cue, for the per-cue "earned" figures.
   const earnedByCue = useMemo(() => {
@@ -391,11 +425,11 @@ export default function Dashboard() {
         <RoyaltiesView royalties={royalties} cues={cues} onImport={importRoyalties} onAdd={addRoyalty} onDelete={deleteRoyalty} />
       )}
 
-      {showAddCue && <AddCueModal batches={batches} onAdd={addCue} onAddBatch={addBatch} onClose={() => setShowAddCue(false)} />}
-      {acceptCue && <AcceptModal cue={acceptCue} onAccept={updateCue} onClose={() => setAcceptCue(null)} />}
+      {showAddCue && <AddCueModal batches={batches} onAdd={addCue} onAddBatch={addBatch} onClose={() => setShowAddCue(false)} showOptions={showOptions} onAddOption={addOption} optionsEnabled={optionsEnabled} />}
+      {acceptCue && <AcceptModal cue={acceptCue} onAccept={updateCue} onClose={() => setAcceptCue(null)} publisherOptions={publisherOptions} onAddOption={addOption} optionsEnabled={optionsEnabled} />}
       {rejectCue && <RejectModal cue={rejectCue} onReject={updateCue} onClose={() => setRejectCue(null)} />}
-      {pitchCue && <AddPitchModal cue={pitchCue} onSave={updateCue} onClose={() => setPitchCue(null)} />}
-      {editCue && <EditCueModal cue={editCue} batches={batches} onSave={updateCue} onAddBatch={addBatch} onClose={() => setEditCue(null)} userId={user.id} audioEnabled={audioEnabled} onSaveAudio={saveAudio} earned={earnedByCue[editCue.id] || 0} royaltiesEnabled={royaltiesEnabled} />}
+      {pitchCue && <AddPitchModal cue={pitchCue} onSave={updateCue} onClose={() => setPitchCue(null)} publisherOptions={publisherOptions} onAddOption={addOption} optionsEnabled={optionsEnabled} />}
+      {editCue && <EditCueModal cue={editCue} batches={batches} onSave={updateCue} onAddBatch={addBatch} onClose={() => setEditCue(null)} userId={user.id} audioEnabled={audioEnabled} onSaveAudio={saveAudio} earned={earnedByCue[editCue.id] || 0} royaltiesEnabled={royaltiesEnabled} showOptions={showOptions} publisherOptions={publisherOptions} onAddOption={addOption} optionsEnabled={optionsEnabled} />}
       {airedCue && <AiredModal cue={airedCue} onSave={saveAired} onClose={() => setAiredCue(null)} />}
     </div>
   )

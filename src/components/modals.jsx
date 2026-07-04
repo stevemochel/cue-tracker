@@ -11,9 +11,10 @@ import {
   money,
 } from '../lib/constants'
 import AudioControls from './AudioControls'
+import OptionSelect from './OptionSelect'
 
 // ─── Add Cue Modal ───
-export function AddCueModal({ batches, onAdd, onAddBatch, onClose }) {
+export function AddCueModal({ batches, onAdd, onAddBatch, onClose, showOptions = SHOWS, onAddOption, optionsEnabled }) {
   const [title, setTitle] = useState('')
   const [show, setShow] = useState(SHOWS[0])
   const [batchId, setBatchId] = useState('')
@@ -85,11 +86,7 @@ export function AddCueModal({ batches, onAdd, onAddBatch, onClose }) {
         <div className="field-row">
           <div className="field">
             <label className="label">Show</label>
-            <select value={show} onChange={(e) => setShow(e.target.value)}>
-              {SHOWS.map((s) => (
-                <option key={s} value={s}>{s}</option>
-              ))}
-            </select>
+            <OptionSelect value={show} onChange={setShow} options={showOptions} onAddOption={(v) => onAddOption('show', v)} canAdd={optionsEnabled} placeholder="New show" />
           </div>
           <div className="field">
             <label className="label">Batch (optional)</label>
@@ -138,7 +135,7 @@ function withValue(options, value) {
 }
 
 // ─── Accept into Catalog Modal ───
-export function AcceptModal({ cue, onAccept, onClose }) {
+export function AcceptModal({ cue, onAccept, onClose, publisherOptions = PUBLISHERS, onAddOption, optionsEnabled }) {
   const [publisher, setPublisher] = useState(cue.publisher || PUBLISHERS[0])
   const [exclusivity, setExclusivity] = useState(cue.exclusivity || EXCLUSIVITY_OPTIONS[0])
   const [tuneSat, setTuneSat] = useState(cue.tuneSat || false)
@@ -163,9 +160,7 @@ export function AcceptModal({ cue, onAccept, onClose }) {
         <div className="field-row">
           <div className="field">
             <label className="label">Publisher</label>
-            <select value={publisher} onChange={(e) => setPublisher(e.target.value)}>
-              {withValue(PUBLISHERS, publisher).map((p) => (<option key={p} value={p}>{p}</option>))}
-            </select>
+            <OptionSelect value={publisher} onChange={setPublisher} options={publisherOptions} onAddOption={(v) => onAddOption('publisher', v)} canAdd={optionsEnabled} placeholder="New publisher" />
           </div>
           <div className="field">
             <label className="label">Exclusivity</label>
@@ -304,7 +299,7 @@ export function RejectModal({ cue, onReject, onClose }) {
 }
 
 // ─── Add Pitch Modal ───
-export function AddPitchModal({ cue, onSave, onClose }) {
+export function AddPitchModal({ cue, onSave, onClose, publisherOptions = PUBLISHERS, onAddOption, optionsEnabled }) {
   const [publisher, setPublisher] = useState(PUBLISHERS[0])
   const [date, setDate] = useState(today())
   const [pitchNotes, setPitchNotes] = useState('')
@@ -325,7 +320,7 @@ export function AddPitchModal({ cue, onSave, onClose }) {
         <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 14 }}>Pitching <strong style={{ color: 'var(--dark)' }}>{cue.title}</strong></div>
         <div className="field-row">
           <div className="field"><label className="label">Publisher</label>
-            <select value={publisher} onChange={(e) => setPublisher(e.target.value)}>{PUBLISHERS.map((p) => (<option key={p}>{p}</option>))}</select>
+            <OptionSelect value={publisher} onChange={setPublisher} options={publisherOptions} onAddOption={(v) => onAddOption('publisher', v)} canAdd={optionsEnabled} placeholder="New publisher" />
           </div>
           <div className="field"><label className="label">Date</label><input type="date" value={date} onChange={(e) => setDate(e.target.value)} /></div>
         </div>
@@ -340,7 +335,7 @@ export function AddPitchModal({ cue, onSave, onClose }) {
 }
 
 // ─── Edit Cue Modal ───
-export function EditCueModal({ cue, batches, onSave, onAddBatch, onClose, userId, audioEnabled, onSaveAudio, earned = 0, royaltiesEnabled }) {
+export function EditCueModal({ cue, batches, onSave, onAddBatch, onClose, userId, audioEnabled, onSaveAudio, earned = 0, royaltiesEnabled, showOptions = SHOWS, publisherOptions = PUBLISHERS, onAddOption, optionsEnabled }) {
   const [title, setTitle] = useState(cue.title)
   const [show, setShow] = useState(cue.show)
   const [batchId, setBatchId] = useState(cue.batchId || '')
@@ -420,9 +415,7 @@ export function EditCueModal({ cue, batches, onSave, onAddBatch, onClose, userId
         <div className="field-row">
           <div className="field">
             <label className="label">Show</label>
-            <select value={show} onChange={(e) => setShow(e.target.value)}>
-              {SHOWS.map((s) => (<option key={s} value={s}>{s}</option>))}
-            </select>
+            <OptionSelect value={show} onChange={setShow} options={showOptions} onAddOption={(v) => onAddOption('show', v)} canAdd={optionsEnabled} placeholder="New show" />
           </div>
           <div className="field">
             <label className="label">Batch (optional)</label>
@@ -472,10 +465,7 @@ export function EditCueModal({ cue, batches, onSave, onAddBatch, onClose, userId
             <div className="field-row">
               <div className="field">
                 <label className="label">Publisher</label>
-                <select value={publisher} onChange={(e) => setPublisher(e.target.value)}>
-                  <option value="">—</option>
-                  {withValue(PUBLISHERS, publisher).map((p) => (<option key={p} value={p}>{p}</option>))}
-                </select>
+                <OptionSelect value={publisher} onChange={setPublisher} options={publisherOptions} onAddOption={(v) => onAddOption('publisher', v)} canAdd={optionsEnabled} allowEmpty placeholder="New publisher" />
               </div>
               <div className="field">
                 <label className="label">Exclusivity</label>

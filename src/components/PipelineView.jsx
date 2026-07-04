@@ -1,5 +1,5 @@
 import {
-  SHOW_COLORS,
+  showColor,
   PIPELINE_STATUSES,
   PIPELINE_LABELS,
   PIPELINE_COLORS,
@@ -10,14 +10,14 @@ import {
 
 // ─── Cue Card (Pipeline) ───
 function CueCard({ cue, batch, onMove, onDelete, onEdit, onAccept, onReject }) {
-  const showColor = SHOW_COLORS[cue.show] || '#64748b'
+  const color = showColor(cue.show)
   const statusIdx = PIPELINE_STATUSES.indexOf(cue.status)
   const dl = cue.dueDate ? daysBetween(today(), cue.dueDate) : null
   const dueColor = dl !== null && dl < 0 ? 'var(--red)' : dl !== null && dl <= 2 ? 'var(--orange)' : 'var(--text-secondary)'
   const isDelivered = cue.status === 'delivered'
 
   return (
-    <div className="cue-card" style={{ borderLeftColor: showColor }}>
+    <div className="cue-card" style={{ borderLeftColor: color }}>
       <div className="cue-card-top">
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
@@ -51,7 +51,7 @@ function CueCard({ cue, batch, onMove, onDelete, onEdit, onAccept, onReject }) {
         </div>
       </div>
       <div className="cue-card-tags">
-        <span className="tag" style={{ background: showColor + '10', color: showColor, borderColor: showColor + '25' }}>{cue.show}</span>
+        <span className="tag" style={{ background: color + '10', color: color, borderColor: color + '25' }}>{cue.show}</span>
         {batch && <span className="tag" style={{ background: 'var(--bg)', color: '#64748b', borderColor: 'var(--border)' }}>{batch.name}</span>}
       </div>
       {cue.notes && <div className="cue-card-notes">{cue.notes}</div>}
@@ -96,7 +96,7 @@ export default function PipelineView({ cues, batches, onMove, onDelete, onEdit, 
       {Object.entries(grouped).map(([group, groupCues]) => (
         <div key={group} className="kanban-group">
           <div className="kanban-group-header">
-            {groupBy === 'show' && <div className="kanban-group-dot" style={{ background: SHOW_COLORS[group] || '#94a3b8' }} />}
+            {groupBy === 'show' && <div className="kanban-group-dot" style={{ background: showColor(group) }} />}
             <div className="kanban-group-title">{group}</div>
             <div className="kanban-group-count">{groupCues.length}</div>
           </div>

@@ -28,6 +28,17 @@ export const KEY_OPTIONS = [
   'F#', 'F#m', 'G', 'Gm', 'Ab', 'Abm', 'A', 'Am', 'Bb', 'Bbm', 'B', 'Bm',
 ]
 
+// Colors for shows not in SHOW_COLORS — assigned deterministically by name so a
+// given custom show always gets the same color.
+const SHOW_PALETTE = ['#4a60dc', '#dc2626', '#7c3aed', '#e88a3a', '#16a34a', '#0891b2', '#db2777', '#ca8a04', '#4f46e5', '#059669']
+export function showColor(name) {
+  if (!name) return '#64748b'
+  if (SHOW_COLORS[name]) return SHOW_COLORS[name]
+  let h = 0
+  for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0
+  return SHOW_PALETTE[h % SHOW_PALETTE.length]
+}
+
 export const PIPELINE_STATUSES = ['need-to-start', 'in-progress', 'delivered']
 export const PIPELINE_LABELS = {
   'need-to-start': 'Need to Start',
