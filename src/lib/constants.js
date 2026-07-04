@@ -74,14 +74,13 @@ export function periodToDate(period) {
   return y ? `${y[1]}-01-01` : null
 }
 
-// Currency formatter that keeps precision for tiny streaming micro-amounts.
+// Currency formatter — always two decimal places for a clean, aligned display.
 export function money(n) {
-  const v = Number(n) || 0
-  return v.toLocaleString('en-US', {
+  return (Number(n) || 0).toLocaleString('en-US', {
     style: 'currency',
     currency: 'USD',
     minimumFractionDigits: 2,
-    maximumFractionDigits: Math.abs(v) < 1 && v !== 0 ? 4 : 2,
+    maximumFractionDigits: 2,
   })
 }
 
