@@ -3,6 +3,26 @@ import { parseCsv, periodToDate, money } from '../lib/constants'
 
 const norm = (s) => (s || '').trim().toLowerCase().replace(/\s+/g, ' ')
 
+// ASCAP work titles that differ from the cue title beyond a substring match.
+const TITLE_ALIASES = { 'high school crush': 'Cruise Control (HS Crush - ASCAP)' }
+
+const parseAmount = (s) => Number(String(s || '').replace(/[\s,$]/g, '')) || 0
+
+// "MM-DD-YYYY" or "YYYY-MM-DD" -> "YYYY Qn"
+function dateToPeriod(dstr) {
+  let y, mo
+  let m = /(\d{4})[-/](\d{1,2})[-/]\d{1,2}/.exec(dstr || '')
+  if (m) {
+    y = +m[1]
+    mo = +m[2]
+  } else if ((m = /(\d{1,2})[-/]\d{1,2}[-/](\d{4})/.exec(dstr || ''))) {
+    mo = +m[1]
+    y = +m[2]
+  }
+  if (!y) return ''
+  return `${y} Q${Math.floor((mo - 1) / 3) + 1}`
+}
+
 // ─── Add / edit a single royalty entry ───
 function RoyaltyModal({ cues, onSave, onClose }) {
   const [form, setForm] = useState({
@@ -97,6 +117,19 @@ export default function RoyaltiesView({ royalties, cues, onImport, onAdd, onDele
   }, [royalties])
   const linkedCount = royalties.filter((r) => r.cueId).length
 
+  // Match an ASCAP work title to a cue (aliases + exact + substring either way).
+  const matchCueId = (work) => {
+    const w = norm(work)
+    if (!w) return null
+    if (TITLE_ALIASES[w]) return cueIdByTitle[norm(TITLE_ALIASES[w])] || null
+    if (cueIdByTitle[w]) return cueIdByTitle[w]
+    for (const c of cues) {
+      const nc = norm(c.title)
+      if (nc && (w.includes(nc) || nc.includes(w))) return c.id
+    }
+    return null
+  }
+
   const handleImport = (e) => {
     const file = e.target.files[0]
     e.target.value = ''
@@ -104,34 +137,94 @@ export default function RoyaltiesView({ royalties, cues, onImport, onAdd, onDele
     const reader = new FileReader()
     reader.onload = async (ev) => {
       const rows = parseCsv(ev.target.result)
-      if (rows.length < 2) return
-      const headers = rows[0].map((h) => h.trim())
-      const col = (n) => headers.indexOf(n)
-      const entries = []
-      for (let i = 1; i < rows.length; i++) {
-        const r = rows[i]
-        const get = (n) => {
-          const j = col(n)
-          return j >= 0 ? (r[j] || '').trim() : ''
-        }
-        const source = get('Source')
-        const work = get('Work')
-        const amount = get('Amount')
-        if (!source && !work && !amount) continue
-        const cueName = get('Cue')
-        const period = get('Period')
-        entries.push({
-          source,
-          sourceType: get('Type'),
-          period,
-          periodSort: periodToDate(period),
-          workTitle: work,
-          cueId: cueName ? cueIdByTitle[norm(cueName)] || null : null,
-          category: get('Category'),
-          plays: get('Plays'),
-          amount,
-        })
+      if (rows.length < 2) {
+        window.alert('That CSV looks empty.')
+        return
       }
+      const headers = rows[0].map((h) => h.trim())
+      const has = (n) => headers.includes(n)
+      const col = (n) => headers.indexOf(n)
+      const body = rows.slice(1)
+      const cell = (r, n) => {
+        const j = col(n)
+        return j >= 0 ? (r[j] || '').trim() : ''
+      }
+
+      let entries = []
+
+      if (has('Source') && has('Amount')) {
+        // The app's own royalty-import format (one row per entry).
+        entries = body
+          .filter((r) => cell(r, 'Source') || cell(r, 'Work') || cell(r, 'Amount'))
+          .map((r) => {
+            const cueName = cell(r, 'Cue')
+            const period = cell(r, 'Period')
+            return {
+              source: cell(r, 'Source'),
+              sourceType: cell(r, 'Type'),
+              period,
+              periodSort: periodToDate(period),
+              workTitle: cell(r, 'Work'),
+              cueId: cueName ? cueIdByTitle[norm(cueName)] || null : matchCueId(cell(r, 'Work')),
+              category: cell(r, 'Category'),
+              plays: cell(r, 'Plays'),
+              amount: cell(r, 'Amount'),
+            }
+          })
+      } else if (has('Work Title') && has('Dollars')) {
+        // Raw ASCAP domestic detail: aggregate per work per distribution quarter.
+        const agg = {}
+        for (const r of body) {
+          const work = cell(r, 'Work Title')
+          if (!work) continue
+          const period = `${cell(r, 'DistributionYear')} Q${cell(r, 'Distribution Quarter')}`.trim()
+          const key = work + '|' + period
+          agg[key] = agg[key] || { work, period, amount: 0, plays: 0 }
+          agg[key].amount += parseAmount(cell(r, 'Dollars'))
+          agg[key].plays += parseInt(cell(r, 'Number of Plays') || '0', 10) || 0
+        }
+        entries = Object.values(agg).map((a) => ({
+          source: 'ASCAP',
+          sourceType: 'PRO',
+          period: a.period,
+          periodSort: periodToDate(a.period),
+          workTitle: a.work,
+          cueId: matchCueId(a.work),
+          category: 'Performance',
+          plays: a.plays,
+          amount: a.amount.toFixed(5),
+        }))
+      } else if (has('Work Title') && has('$ Amount')) {
+        // Raw ASCAP international: aggregate per work / period / revenue class.
+        const agg = {}
+        for (const r of body) {
+          const work = cell(r, 'Work Title')
+          if (!work) continue
+          const cat = cell(r, 'Revenue Class Description') || 'Performance'
+          const period = dateToPeriod(cell(r, 'Performance Start Date') || cell(r, 'Distribution Date'))
+          const key = work + '|' + period + '|' + cat
+          agg[key] = agg[key] || { work, period, cat, amount: 0 }
+          agg[key].amount += parseAmount(cell(r, '$ Amount'))
+        }
+        entries = Object.values(agg).map((a) => ({
+          source: 'ASCAP',
+          sourceType: 'PRO',
+          period: a.period,
+          periodSort: periodToDate(a.period),
+          workTitle: a.work,
+          cueId: matchCueId(a.work),
+          category: a.cat,
+          plays: '',
+          amount: a.amount.toFixed(5),
+        }))
+      } else {
+        window.alert(
+          'Unrecognized CSV. Upload an ASCAP statement export (domestic or international) or the app’s royalty-import format.'
+        )
+        return
+      }
+
+      entries = entries.filter((en) => parseAmount(en.amount) !== 0 || en.workTitle)
       if (!entries.length) {
         window.alert('No royalty rows found in that CSV.')
         return
