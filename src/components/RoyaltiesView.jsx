@@ -8,6 +8,14 @@ const TITLE_ALIASES = { 'high school crush': 'Cruise Control (HS Crush - ASCAP)'
 
 const parseAmount = (s) => Number(String(s || '').replace(/[\s,$]/g, '')) || 0
 
+// Fingerprint of one earning, used to detect already-imported duplicates.
+// Two entries with the same source, period, track, category, and amount are
+// treated as the same royalty.
+const entryKey = (e) =>
+  [e.source, e.period, e.workTitle, e.category, parseAmount(e.amount).toFixed(5)]
+    .map((v) => String(v ?? '').trim().toLowerCase())
+    .join('|')
+
 // "MM-DD-YYYY" or "YYYY-MM-DD" -> "YYYY Qn"
 function dateToPeriod(dstr) {
   let y, mo
@@ -279,8 +287,35 @@ export default function RoyaltiesView({ royalties, cues, onImport, onAdd, onDele
         window.alert('No royalty rows found in that CSV.')
         return
       }
-      const n = await onImport(entries)
-      if (n != null) window.alert(`Imported ${n} royalty ${n === 1 ? 'entry' : 'entries'}.`)
+
+      // Skip entries that are already in the ledger (or repeated within this
+      // file), so re-importing a statement can't double-count royalties.
+      const existing = new Set(royalties.map(entryKey))
+      const seen = new Set()
+      const fresh = []
+      let duplicates = 0
+      for (const en of entries) {
+        const k = entryKey(en)
+        if (existing.has(k) || seen.has(k)) {
+          duplicates++
+          continue
+        }
+        seen.add(k)
+        fresh.push(en)
+      }
+
+      if (!fresh.length) {
+        window.alert(`Nothing imported — all ${duplicates} row${duplicates === 1 ? '' : 's'} were already in your royalties.`)
+        return
+      }
+      const n = await onImport(fresh)
+      if (n != null) {
+        window.alert(
+          `Imported ${n} royalty ${n === 1 ? 'entry' : 'entries'}` +
+            (duplicates ? ` (skipped ${duplicates} already imported)` : '') +
+            '.'
+        )
+      }
     }
     reader.readAsText(file)
   }
