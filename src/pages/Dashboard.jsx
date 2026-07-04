@@ -268,6 +268,23 @@ export default function Dashboard() {
     a.click()
   }
 
+  // Downloadable starter template for bulk-adding placed / back-catalog cues.
+  const downloadTemplate = () => {
+    const headers = ['Title', 'Status', 'Publisher', 'Exclusivity', 'Placement', 'Genre', 'Key', 'BPM', 'Duration', 'TuneSat', 'ASCAP', 'On Disco', 'Network', 'Air Show', 'Episode', 'First Air Date', 'Show', 'Due Date', 'Notes']
+    const examples = [
+      ['Example — Aired placement (edit or delete this row)', 'aired', 'Atomica Music', 'Exclusive', 'Bravo: BDMED S10', 'Drama, Tension', 'A minor', '90', '2:30', 'Yes', 'Yes', 'Yes', 'Bravo', 'Below Deck Mediterranean', 'Bubble Trouble', '2026-01-26', '', '', 'Back-catalog placement'],
+      ['Example — Accepted catalog (edit or delete this row)', 'accepted', 'Pond5, ThatPitch', 'Non-Exclusive', '', 'Chill, Pop', 'C major', '110', '2:15', 'Yes', 'No', 'Yes', '', '', '', '', '', '', 'From back catalog'],
+      ['Example — Available to repitch (edit or delete this row)', 'available', '', 'Available', '', 'Ambient', '', '120', '2:00', 'No', 'No', 'No', '', '', '', '', '', '', 'Available'],
+    ]
+    const esc = (v) => '"' + String(v ?? '').replace(/"/g, '""') + '"'
+    const csv = [headers, ...examples].map((r) => r.map(esc).join(',')).join('\n')
+    const blob = new Blob([csv], { type: 'text/csv' })
+    const a = document.createElement('a')
+    a.href = URL.createObjectURL(blob)
+    a.download = 'cue_import_template.csv'
+    a.click()
+  }
+
   const importCSV = (e) => {
     const file = e.target.files[0]
     if (!file) return
@@ -365,6 +382,7 @@ export default function Dashboard() {
         <div className="no-print" style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           <button className="btn btn-ghost" onClick={() => window.print()}>🖨</button>
           <button className="btn btn-ghost" onClick={exportCSV}>↓ Export</button>
+          <button className="btn btn-ghost" onClick={downloadTemplate} title="Download a blank cue-import template">⤓ Template</button>
           <label className="btn btn-ghost" style={{ cursor: 'pointer', margin: 0 }}>
             ↑ Import
             <input type="file" accept=".csv" onChange={importCSV} style={{ display: 'none' }} />
