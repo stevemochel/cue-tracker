@@ -8,6 +8,21 @@ const TITLE_ALIASES = { 'high school crush': 'Cruise Control (HS Crush - ASCAP)'
 
 const parseAmount = (s) => Number(String(s || '').replace(/[\s,$]/g, '')) || 0
 
+// Consistent color per royalty source for the breakdown cards.
+const SOURCE_COLORS = {
+  ASCAP: '#4a60dc',
+  Songtrust: '#7c3aed',
+  'Prolific Arts': '#e88a3a',
+  LANDR: '#0891b2',
+}
+const SOURCE_PALETTE = ['#16a34a', '#db2777', '#ca8a04', '#0d9488', '#4f46e5', '#dc2626']
+function sourceColor(name) {
+  if (SOURCE_COLORS[name]) return SOURCE_COLORS[name]
+  let h = 0
+  for (let i = 0; i < (name || '').length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0
+  return SOURCE_PALETTE[h % SOURCE_PALETTE.length]
+}
+
 // Fingerprint of one earning, used to detect already-imported duplicates.
 // Two entries with the same source, period, track, category, and amount are
 // treated as the same royalty.
@@ -330,9 +345,15 @@ export default function RoyaltiesView({ royalties, cues, onImport, onAdd, onDele
       </div>
 
       {bySource.length > 0 && (
-        <div className="toolbar" style={{ gap: 8 }}>
+        <div className="source-breakdown">
           {bySource.map(([s, amt]) => (
-            <span key={s} className="chip" title={s}>{s}: {money(amt)}</span>
+            <div key={s} className="source-card" style={{ borderTopColor: sourceColor(s) }}>
+              <div className="source-name">
+                <span className="source-dot" style={{ background: sourceColor(s) }} />
+                {s}
+              </div>
+              <div className="source-amt" style={{ color: sourceColor(s) }}>{money(amt)}</div>
+            </div>
           ))}
         </div>
       )}

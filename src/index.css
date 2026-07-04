@@ -615,6 +615,46 @@ tr:hover td {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
+/* Royalty source breakdown cards */
+.source-breakdown {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.source-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 12px 18px;
+  min-width: 140px;
+  flex: 1 1 auto;
+  max-width: 240px;
+}
+.source-name {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+}
+.source-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.source-amt {
+  font-size: 22px;
+  font-weight: 800;
+  margin-top: 4px;
+}
+
 /* Empty state */
 .empty {
   text-align: center;
