@@ -53,7 +53,7 @@ export default function Login() {
     <div className="auth-screen">
       <div className="auth-card">
         <div className="auth-header" style={{ display: 'flex', justifyContent: 'center' }}>
-          <Logo height={54} />
+          <Logo full height={104} />
         </div>
 
         {mode !== 'reset' && (

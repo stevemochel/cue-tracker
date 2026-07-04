@@ -105,9 +105,15 @@ textarea:focus {
   align-items: center;
   gap: 11px;
 }
-.brand-icon {
+.brand-mark {
   display: block;
   flex-shrink: 0;
+  object-fit: contain;
+}
+.brand-full {
+  display: block;
+  max-width: 100%;
+  height: auto;
 }
 .brand-word {
   display: flex;

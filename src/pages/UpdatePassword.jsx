@@ -31,7 +31,7 @@ export default function UpdatePassword() {
     <div className="auth-screen">
       <div className="auth-card">
         <div className="auth-header" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-          <Logo height={54} />
+          <Logo full height={96} />
           <div className="brand-sub">Set a new password</div>
         </div>
 
