@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
+import Logo from '../components/Logo'
 
 // Shown when the user arrives via a password-reset email link.
 export default function UpdatePassword() {
@@ -29,11 +30,9 @@ export default function UpdatePassword() {
   return (
     <div className="auth-screen">
       <div className="auth-card">
-        <div className="auth-header">
-          <div className="brand-title" style={{ fontSize: 26 }}>
-            <span style={{ color: 'var(--blue)' }}>CUE</span> <span style={{ color: 'var(--orange)' }}>TRACKER</span>
-          </div>
-          <div className="brand-sub" style={{ marginTop: 4 }}>Set a new password</div>
+        <div className="auth-header" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+          <Logo height={54} />
+          <div className="brand-sub">Set a new password</div>
         </div>
 
         <form className="auth-form" onSubmit={handleSubmit}>

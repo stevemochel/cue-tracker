@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import Logo from '../components/Logo'
 
 export default function Login() {
   const { user, signIn, signUp, resetPassword } = useAuth()
@@ -51,11 +52,8 @@ export default function Login() {
   return (
     <div className="auth-screen">
       <div className="auth-card">
-        <div className="auth-header">
-          <div className="brand-title" style={{ fontSize: 26 }}>
-            <span style={{ color: 'var(--blue)' }}>CUE</span> <span style={{ color: 'var(--orange)' }}>TRACKER</span>
-          </div>
-          <div className="brand-sub" style={{ marginTop: 4 }}>Library Music Pipeline</div>
+        <div className="auth-header" style={{ display: 'flex', justifyContent: 'center' }}>
+          <Logo height={54} />
         </div>
 
         {mode !== 'reset' && (

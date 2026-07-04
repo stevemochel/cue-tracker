@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
 import { rowToCue, cueToRow, rowToBatch, batchToRow, rowToRoyalty, royaltyToRow } from '../lib/mappers'
 import { PIPELINE_STATUSES, today, parseCsv, newId, SHOWS, PUBLISHERS } from '../lib/constants'
+import Logo from '../components/Logo'
 import StatsBar from '../components/StatsBar'
 import PipelineView from '../components/PipelineView'
 import CatalogView from '../components/CatalogView'
@@ -381,12 +382,7 @@ export default function Dashboard() {
     <div className="app">
       <div className="header">
         <div className="header-left">
-          <div>
-            <div className="brand-title">
-              <span style={{ color: 'var(--blue)' }}>CUE</span> <span style={{ color: 'var(--orange)' }}>TRACKER</span>
-            </div>
-            <div className="brand-sub">Library Music Pipeline</div>
-          </div>
+          <Logo height={42} />
         </div>
         <div className="no-print" style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           <button className="btn btn-ghost" onClick={() => window.print()}>🖨</button>

@@ -98,6 +98,36 @@ textarea:focus {
   text-transform: uppercase;
   margin-top: 1px;
 }
+
+/* "Placed" logo lockup */
+.brand-logo {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+.brand-icon {
+  display: block;
+  flex-shrink: 0;
+}
+.brand-word {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+}
+.brand-placed {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--dark);
+  letter-spacing: -0.01em;
+}
+.brand-tag {
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  margin-top: 4px;
+}
 .account-menu {
   display: flex;
   align-items: center;
