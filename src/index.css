@@ -615,6 +615,18 @@ tr:hover td {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
+/* Inline checkbox + label (e.g. "Signed split sheet") */
+.check {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  cursor: pointer;
+}
+.check input {
+  width: auto;
+}
+
 /* Royalty source breakdown cards */
 .source-breakdown {
   display: flex;

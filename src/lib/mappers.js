@@ -36,6 +36,8 @@ export function rowToCue(row) {
     dueDate: row.due_date || '',
     batchId: row.batch_id || null,
     audioPath: row.audio_path || '',
+    collaborators: row.collaborators || '',
+    splitSheet: !!row.split_sheet,
   }
 }
 
@@ -89,6 +91,8 @@ export function cueToRow(cue, userId) {
     due_date: nn(cue.dueDate),
     batch_id: cue.batchId || null,
     audio_path: nn(cue.audioPath),
+    collaborators: nn(cue.collaborators),
+    split_sheet: !!cue.splitSheet,
     user_id: userId,
   }
 }

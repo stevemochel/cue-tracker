@@ -40,8 +40,9 @@ export default function Dashboard() {
   // Which optional columns the DB has yet. Missing ones are dropped from writes
   // so nothing errors on an older schema. Ref for fresh reads inside callbacks;
   // `audioEnabled` state drives whether the upload UI is shown.
-  const capsRef = useRef({ airings: true, audio: true })
+  const capsRef = useRef({ airings: true, audio: true, collab: true })
   const [audioEnabled, setAudioEnabled] = useState(false)
+  const [collabEnabled, setCollabEnabled] = useState(false)
 
   // Build a DB payload, dropping columns the DB doesn't have yet.
   const toRow = useCallback(
@@ -49,6 +50,10 @@ export default function Dashboard() {
       const row = cueToRow(cue, user.id)
       if (!capsRef.current.airings) delete row.airings
       if (!capsRef.current.audio) delete row.audio_path
+      if (!capsRef.current.collab) {
+        delete row.collaborators
+        delete row.split_sheet
+      }
       return row
     },
     [user.id]
@@ -60,13 +65,15 @@ export default function Dashboard() {
     ;(async () => {
       setLoading(true)
       // Detect optional columns (each errors only if it doesn't exist).
-      const [airProbe, audProbe] = await Promise.all([
+      const [airProbe, audProbe, collabProbe] = await Promise.all([
         supabase.from('cues').select('airings').limit(1),
         supabase.from('cues').select('audio_path').limit(1),
+        supabase.from('cues').select('collaborators').limit(1),
       ])
       if (active) {
-        capsRef.current = { airings: !airProbe.error, audio: !audProbe.error }
+        capsRef.current = { airings: !airProbe.error, audio: !audProbe.error, collab: !collabProbe.error }
         setAudioEnabled(!audProbe.error)
+        setCollabEnabled(!collabProbe.error)
       }
       const [cuesRes, batchesRes] = await Promise.all([
         supabase.from('cues').select('*').order('created_at', { ascending: true }),
@@ -253,12 +260,12 @@ export default function Dashboard() {
 
   // ── CSV export / import ──
   const exportCSV = () => {
-    const headers = ['Title', 'Status', 'Show', 'Genre', 'Publisher', 'Exclusivity', 'Placement', 'TuneSat', 'ASCAP', 'On Disco', 'Key', 'BPM', 'Duration', 'Network', 'Air Show', 'Episode', 'First Air Date', 'Notes', 'Batch', 'Due Date', 'Pitched To']
+    const headers = ['Title', 'Status', 'Show', 'Genre', 'Publisher', 'Exclusivity', 'Placement', 'TuneSat', 'ASCAP', 'On Disco', 'Key', 'BPM', 'Duration', 'Network', 'Air Show', 'Episode', 'First Air Date', 'Collaborators', 'Split Sheet', 'Notes', 'Batch', 'Due Date', 'Pitched To']
     const rows = [headers.join(',')]
     cues.forEach((c) => {
       const pitched = (c.pitchedTo || []).map((p) => `${p.publisher} (${p.date})`).join('; ')
       const batch = batches.find((b) => b.id === c.batchId)
-      const row = [c.title, c.status, c.show, c.genre, c.publisher, c.exclusivity, c.placement || '', c.tuneSat ? 'Yes' : 'No', c.ascap ? 'Yes' : 'No', c.onDisco ? 'Yes' : 'No', c.musicalKey, c.bpm, c.duration, c.airNetwork || '', c.airShow || '', c.airEpisode || '', c.firstAirDate || '', c.notes, batch ? batch.name : '', c.dueDate, pitched].map((v) => '"' + String(v ?? '').replace(/"/g, '""') + '"')
+      const row = [c.title, c.status, c.show, c.genre, c.publisher, c.exclusivity, c.placement || '', c.tuneSat ? 'Yes' : 'No', c.ascap ? 'Yes' : 'No', c.onDisco ? 'Yes' : 'No', c.musicalKey, c.bpm, c.duration, c.airNetwork || '', c.airShow || '', c.airEpisode || '', c.firstAirDate || '', c.collaborators || '', c.splitSheet ? 'Yes' : 'No', c.notes, batch ? batch.name : '', c.dueDate, pitched].map((v) => '"' + String(v ?? '').replace(/"/g, '""') + '"')
       rows.push(row.join(','))
     })
     const blob = new Blob([rows.join('\n')], { type: 'text/csv' })
@@ -270,11 +277,11 @@ export default function Dashboard() {
 
   // Downloadable starter template for bulk-adding placed / back-catalog cues.
   const downloadTemplate = () => {
-    const headers = ['Title', 'Status', 'Publisher', 'Exclusivity', 'Placement', 'Genre', 'Key', 'BPM', 'Duration', 'TuneSat', 'ASCAP', 'On Disco', 'Network', 'Air Show', 'Episode', 'First Air Date', 'Show', 'Due Date', 'Notes']
+    const headers = ['Title', 'Status', 'Publisher', 'Exclusivity', 'Placement', 'Genre', 'Key', 'BPM', 'Duration', 'TuneSat', 'ASCAP', 'On Disco', 'Network', 'Air Show', 'Episode', 'First Air Date', 'Collaborators', 'Split Sheet', 'Show', 'Due Date', 'Notes']
     const examples = [
-      ['Example — Aired placement (edit or delete this row)', 'aired', 'Atomica Music', 'Exclusive', 'Bravo: BDMED S10', 'Drama, Tension', 'A minor', '90', '2:30', 'Yes', 'Yes', 'Yes', 'Bravo', 'Below Deck Mediterranean', 'Bubble Trouble', '2026-01-26', '', '', 'Back-catalog placement'],
-      ['Example — Accepted catalog (edit or delete this row)', 'accepted', 'Pond5, ThatPitch', 'Non-Exclusive', '', 'Chill, Pop', 'C major', '110', '2:15', 'Yes', 'No', 'Yes', '', '', '', '', '', '', 'From back catalog'],
-      ['Example — Available to repitch (edit or delete this row)', 'available', '', 'Available', '', 'Ambient', '', '120', '2:00', 'No', 'No', 'No', '', '', '', '', '', '', 'Available'],
+      ['Example — Aired placement (edit or delete this row)', 'aired', 'Atomica Music', 'Exclusive', 'Bravo: BDMED S10', 'Drama, Tension', 'A minor', '90', '2:30', 'Yes', 'Yes', 'Yes', 'Bravo', 'Below Deck Mediterranean', 'Bubble Trouble', '2026-01-26', '', 'No', '', '', 'Back-catalog placement'],
+      ['Example — Co-write with split sheet (edit or delete this row)', 'accepted', 'Pond5, ThatPitch', 'Non-Exclusive', '', 'Chill, Pop', 'C major', '110', '2:15', 'Yes', 'No', 'Yes', '', '', '', '', 'Trevis T.', 'Yes', '', '', 'Co-written'],
+      ['Example — Available to repitch (edit or delete this row)', 'available', '', 'Available', '', 'Ambient', '', '120', '2:00', 'No', 'No', 'No', '', '', '', '', '', 'No', '', '', 'Available'],
     ]
     const esc = (v) => '"' + String(v ?? '').replace(/"/g, '""') + '"'
     const csv = [headers, ...examples].map((r) => r.map(esc).join(',')).join('\n')
@@ -338,6 +345,8 @@ export default function Dashboard() {
           airShow,
           airEpisode: episode,
           firstAirDate: airDate,
+          collaborators: get('Collaborators'),
+          splitSheet: yesno(get('Split Sheet') || get('Signed Split Sheet')),
           pitchedTo: [],
         })
       }
@@ -443,11 +452,11 @@ export default function Dashboard() {
         <RoyaltiesView royalties={royalties} cues={cues} onImport={importRoyalties} onAdd={addRoyalty} onDelete={deleteRoyalty} />
       )}
 
-      {showAddCue && <AddCueModal batches={batches} onAdd={addCue} onAddBatch={addBatch} onClose={() => setShowAddCue(false)} showOptions={showOptions} onAddOption={addOption} optionsEnabled={optionsEnabled} />}
+      {showAddCue && <AddCueModal batches={batches} onAdd={addCue} onAddBatch={addBatch} onClose={() => setShowAddCue(false)} showOptions={showOptions} onAddOption={addOption} optionsEnabled={optionsEnabled} collabEnabled={collabEnabled} />}
       {acceptCue && <AcceptModal cue={acceptCue} onAccept={updateCue} onClose={() => setAcceptCue(null)} publisherOptions={publisherOptions} onAddOption={addOption} optionsEnabled={optionsEnabled} />}
       {rejectCue && <RejectModal cue={rejectCue} onReject={updateCue} onClose={() => setRejectCue(null)} />}
       {pitchCue && <AddPitchModal cue={pitchCue} onSave={updateCue} onClose={() => setPitchCue(null)} publisherOptions={publisherOptions} onAddOption={addOption} optionsEnabled={optionsEnabled} />}
-      {editCue && <EditCueModal cue={editCue} batches={batches} onSave={updateCue} onAddBatch={addBatch} onClose={() => setEditCue(null)} userId={user.id} audioEnabled={audioEnabled} onSaveAudio={saveAudio} earned={earnedByCue[editCue.id] || 0} royaltiesEnabled={royaltiesEnabled} showOptions={showOptions} publisherOptions={publisherOptions} onAddOption={addOption} optionsEnabled={optionsEnabled} />}
+      {editCue && <EditCueModal cue={editCue} batches={batches} onSave={updateCue} onAddBatch={addBatch} onClose={() => setEditCue(null)} userId={user.id} audioEnabled={audioEnabled} onSaveAudio={saveAudio} earned={earnedByCue[editCue.id] || 0} royaltiesEnabled={royaltiesEnabled} showOptions={showOptions} publisherOptions={publisherOptions} onAddOption={addOption} optionsEnabled={optionsEnabled} collabEnabled={collabEnabled} />}
       {airedCue && <AiredModal cue={airedCue} onSave={saveAired} onClose={() => setAiredCue(null)} />}
     </div>
   )

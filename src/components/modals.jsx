@@ -14,13 +14,15 @@ import AudioControls from './AudioControls'
 import OptionSelect from './OptionSelect'
 
 // ─── Add Cue Modal ───
-export function AddCueModal({ batches, onAdd, onAddBatch, onClose, showOptions = SHOWS, onAddOption, optionsEnabled }) {
+export function AddCueModal({ batches, onAdd, onAddBatch, onClose, showOptions = SHOWS, onAddOption, optionsEnabled, collabEnabled }) {
   const [title, setTitle] = useState('')
   const [show, setShow] = useState(SHOWS[0])
   const [batchId, setBatchId] = useState('')
   const [genre, setGenre] = useState('')
   const [notes, setNotes] = useState('')
   const [dueDate, setDueDate] = useState('')
+  const [collaborators, setCollaborators] = useState('')
+  const [splitSheet, setSplitSheet] = useState(false)
   const [creatingBatch, setCreatingBatch] = useState(false)
   const [newBatchName, setNewBatchName] = useState(`Batch ${String(batches.length + 1).padStart(2, '0')}`)
   const [newBatchSignUp, setNewBatchSignUp] = useState('')
@@ -56,6 +58,8 @@ export function AddCueModal({ batches, onAdd, onAddBatch, onClose, showOptions =
       genre,
       notes,
       dueDate,
+      collaborators,
+      splitSheet,
       status: 'need-to-start',
       publisher: '',
       exclusivity: '',
@@ -118,6 +122,14 @@ export function AddCueModal({ batches, onAdd, onAddBatch, onClose, showOptions =
           <div className="field"><label className="label">Genre / Style</label><input value={genre} onChange={(e) => setGenre(e.target.value)} placeholder="e.g. Drama/Tension" /></div>
         </div>
         <div className="field"><label className="label">Notes</label><textarea style={{ height: 56, resize: 'vertical' }} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Reference notes..." /></div>
+        {collabEnabled && (
+          <div className="field-row" style={{ alignItems: 'flex-end' }}>
+            <div className="field"><label className="label">Collaborators</label><input value={collaborators} onChange={(e) => setCollaborators(e.target.value)} placeholder="e.g. Trevis T. (leave blank if solo)" /></div>
+            <label className="check" style={{ marginBottom: 10, whiteSpace: 'nowrap' }}>
+              <input type="checkbox" checked={splitSheet} onChange={(e) => setSplitSheet(e.target.checked)} /> Signed split sheet
+            </label>
+          </div>
+        )}
         <div className="modal-footer">
           <button className="btn btn-ghost" onClick={onClose}>Cancel</button>
           <button className="btn btn-primary" disabled={!title.trim() || !dueDate || saving} style={{ opacity: title.trim() && dueDate && !saving ? 1 : 0.4 }} onClick={handleAdd}>
@@ -335,7 +347,7 @@ export function AddPitchModal({ cue, onSave, onClose, publisherOptions = PUBLISH
 }
 
 // ─── Edit Cue Modal ───
-export function EditCueModal({ cue, batches, onSave, onAddBatch, onClose, userId, audioEnabled, onSaveAudio, earned = 0, royaltiesEnabled, showOptions = SHOWS, publisherOptions = PUBLISHERS, onAddOption, optionsEnabled }) {
+export function EditCueModal({ cue, batches, onSave, onAddBatch, onClose, userId, audioEnabled, onSaveAudio, earned = 0, royaltiesEnabled, showOptions = SHOWS, publisherOptions = PUBLISHERS, onAddOption, optionsEnabled, collabEnabled }) {
   const [title, setTitle] = useState(cue.title)
   const [show, setShow] = useState(cue.show)
   const [batchId, setBatchId] = useState(cue.batchId || '')
@@ -359,6 +371,8 @@ export function EditCueModal({ cue, batches, onSave, onAddBatch, onClose, userId
   const [airEpisode, setAirEpisode] = useState(firstAiring ? firstAiring.episode : cue.airEpisode || '')
   const [firstAirDate, setFirstAirDate] = useState(firstAiring ? firstAiring.date : cue.firstAirDate || '')
   const [audioPath, setAudioPath] = useState(cue.audioPath || '')
+  const [collaborators, setCollaborators] = useState(cue.collaborators || '')
+  const [splitSheet, setSplitSheet] = useState(cue.splitSheet || false)
   const [creatingBatch, setCreatingBatch] = useState(false)
   const [newBatchName, setNewBatchName] = useState(`Batch ${String(batches.length + 1).padStart(2, '0')}`)
   const [newBatchSignUp, setNewBatchSignUp] = useState('')
@@ -398,7 +412,7 @@ export function EditCueModal({ cue, batches, onSave, onAddBatch, onClose, userId
     const ok = await onSave({
       ...cue, title: title.trim(), show, batchId: batchId || null, genre, notes, dueDate,
       publisher, exclusivity, placement, tuneSat, ascap, onDisco, musicalKey, bpm, duration,
-      airings, airNetwork, airShow, airEpisode, firstAirDate, audioPath,
+      airings, airNetwork, airShow, airEpisode, firstAirDate, audioPath, collaborators, splitSheet,
     })
     setSaving(false)
     if (ok) onClose()
@@ -445,6 +459,18 @@ export function EditCueModal({ cue, batches, onSave, onAddBatch, onClose, userId
           <div className="field"><label className="label">Genre / Style</label><input value={genre} onChange={(e) => setGenre(e.target.value)} /></div>
         </div>
         <div className="field"><label className="label">Notes</label><textarea style={{ height: 56, resize: 'vertical' }} value={notes} onChange={(e) => setNotes(e.target.value)} /></div>
+
+        {collabEnabled && (
+          <>
+            <div className="modal-section">Collaboration</div>
+            <div className="field-row" style={{ alignItems: 'flex-end' }}>
+              <div className="field"><label className="label">Collaborators</label><input value={collaborators} onChange={(e) => setCollaborators(e.target.value)} placeholder="e.g. Trevis T. (leave blank if solo)" /></div>
+              <label className="check" style={{ marginBottom: 10, whiteSpace: 'nowrap' }}>
+                <input type="checkbox" checked={splitSheet} onChange={(e) => setSplitSheet(e.target.checked)} /> Signed split sheet
+              </label>
+            </div>
+          </>
+        )}
 
         {audioEnabled && userId && (
           <>
