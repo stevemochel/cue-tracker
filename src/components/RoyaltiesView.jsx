@@ -217,14 +217,40 @@ export default function RoyaltiesView({ royalties, cues, onImport, onAdd, onDele
           plays: '',
           amount: a.amount.toFixed(5),
         }))
+      } else if (has('Track') && has('Net earnings (USD)')) {
+        // Raw LANDR distributor report: aggregate per track per payment month.
+        const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+        const agg = {}
+        for (const r of body) {
+          const track = cell(r, 'Track')
+          if (!track) continue
+          const ym = /(\d{4})-(\d{2})/.exec(cell(r, 'Payment Date'))
+          const period = ym ? `${MONTHS[+ym[2] - 1]} ${ym[1]}` : ''
+          const periodSort = ym ? `${ym[1]}-${ym[2]}-01` : null
+          const key = track + '|' + period
+          agg[key] = agg[key] || { track, period, periodSort, amount: 0, plays: 0 }
+          agg[key].amount += parseAmount(cell(r, 'Net earnings (USD)'))
+          agg[key].plays += parseInt(cell(r, 'Quantity of sales or streams') || '0', 10) || 0
+        }
+        entries = Object.values(agg).map((a) => ({
+          source: 'LANDR',
+          sourceType: 'Distributor',
+          period: a.period,
+          periodSort: a.periodSort,
+          workTitle: a.track,
+          cueId: matchCueId(a.track),
+          category: 'Streaming/Sales',
+          plays: a.plays,
+          amount: a.amount.toFixed(5),
+        }))
       } else {
         window.alert(
-          'Unrecognized CSV. Upload an ASCAP statement export (domestic or international) or the app’s royalty-import format.'
+          'Unrecognized CSV. Upload an ASCAP or LANDR statement export, or the app’s royalty-import format.'
         )
         return
       }
 
-      entries = entries.filter((en) => parseAmount(en.amount) !== 0 || en.workTitle)
+      entries = entries.filter((en) => parseAmount(en.amount) !== 0)
       if (!entries.length) {
         window.alert('No royalty rows found in that CSV.')
         return
