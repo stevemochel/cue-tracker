@@ -38,7 +38,7 @@ export function AddCueModal({ batches, onAdd, onAddBatch, onClose, showOptions =
       setBatchId(v)
       setCreatingBatch(false)
       const b = batches.find((b) => b.id === v)
-      if (b) setDueDate(b.deliver)
+      if (b && b.deliver) setDueDate(b.deliver) // fill from the batch's deliver date
     }
   }
   const handleCreateBatch = async () => {
@@ -110,7 +110,7 @@ export function AddCueModal({ batches, onAdd, onAddBatch, onClose, showOptions =
             <div className="field-row">
               <div className="field"><label className="label" style={{ fontSize: 10 }}>Name</label><input value={newBatchName} onChange={(e) => setNewBatchName(e.target.value)} /></div>
               <div className="field"><label className="label" style={{ fontSize: 10 }}>Sign-Up</label><input type="date" value={newBatchSignUp} onChange={(e) => setNewBatchSignUp(e.target.value)} /></div>
-              <div className="field"><label className="label" style={{ fontSize: 10 }}>Deliver</label><input type="date" value={newBatchDeliver} onChange={(e) => setNewBatchDeliver(e.target.value)} /></div>
+              <div className="field"><label className="label" style={{ fontSize: 10 }}>Deliver</label><input type="date" value={newBatchDeliver} onChange={(e) => { setNewBatchDeliver(e.target.value); setDueDate(e.target.value) }} /></div>
             </div>
             <div style={{ display: 'flex', gap: 8, marginTop: 10, justifyContent: 'flex-end' }}>
               <button className="btn btn-ghost btn-sm" onClick={() => { setCreatingBatch(false); setBatchId('') }}>Cancel</button>
@@ -454,7 +454,7 @@ export function EditCueModal({ cue, batches, onSave, onAddBatch, onClose, userId
             <div className="field-row">
               <div className="field"><label className="label" style={{ fontSize: 10 }}>Name</label><input value={newBatchName} onChange={(e) => setNewBatchName(e.target.value)} /></div>
               <div className="field"><label className="label" style={{ fontSize: 10 }}>Sign-Up</label><input type="date" value={newBatchSignUp} onChange={(e) => setNewBatchSignUp(e.target.value)} /></div>
-              <div className="field"><label className="label" style={{ fontSize: 10 }}>Deliver</label><input type="date" value={newBatchDeliver} onChange={(e) => setNewBatchDeliver(e.target.value)} /></div>
+              <div className="field"><label className="label" style={{ fontSize: 10 }}>Deliver</label><input type="date" value={newBatchDeliver} onChange={(e) => { setNewBatchDeliver(e.target.value); setDueDate(e.target.value) }} /></div>
             </div>
             <div style={{ display: 'flex', gap: 8, marginTop: 10, justifyContent: 'flex-end' }}>
               <button className="btn btn-ghost btn-sm" onClick={() => { setCreatingBatch(false); setBatchId('') }}>Cancel</button>
