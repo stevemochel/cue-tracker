@@ -53,6 +53,16 @@ export const PIPELINE_COLORS = {
 
 export const CATALOG_STATUSES = ['accepted', 'aired', 'available']
 
+// Every status with a friendly label, for the Edit modal's Status dropdown.
+export const ALL_STATUS_OPTIONS = [
+  { value: 'need-to-start', label: 'Need to Start' },
+  { value: 'in-progress', label: 'In Progress' },
+  { value: 'delivered', label: 'Delivered' },
+  { value: 'accepted', label: 'Accepted' },
+  { value: 'aired', label: 'Aired' },
+  { value: 'available', label: 'Available' },
+]
+
 // ── Small helpers ──
 
 export function newId() {

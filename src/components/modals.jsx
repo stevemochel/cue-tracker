@@ -4,6 +4,7 @@ import {
   PUBLISHERS,
   EXCLUSIVITY_OPTIONS,
   KEY_OPTIONS,
+  ALL_STATUS_OPTIONS,
   formatDate,
   today,
   generatePitchId,
@@ -377,11 +378,12 @@ export function EditCueModal({ cue, batches, onSave, onAddBatch, onClose, userId
   const [newBatchName, setNewBatchName] = useState(`Batch ${String(batches.length + 1).padStart(2, '0')}`)
   const [newBatchSignUp, setNewBatchSignUp] = useState('')
   const [newBatchDeliver, setNewBatchDeliver] = useState('')
+  const [status, setStatus] = useState(cue.status)
   const [saving, setSaving] = useState(false)
 
-  const isAccepted = cue.status === 'accepted'
-  const isAired = cue.status === 'aired'
-  const isAvailable = cue.status === 'available'
+  const isAccepted = status === 'accepted'
+  const isAired = status === 'aired'
+  const isAvailable = status === 'available'
   const isCatalog = isAccepted || isAired || isAvailable
 
   const handleBatchChange = (v) => {
@@ -410,7 +412,7 @@ export function EditCueModal({ cue, batches, onSave, onAddBatch, onClose, userId
       ? [{ id: firstAiring ? firstAiring.id : newId(), network: airNetwork, show: airShow, episode: airEpisode, date: firstAirDate }, ...rest]
       : rest
     const ok = await onSave({
-      ...cue, title: title.trim(), show, batchId: batchId || null, genre, notes, dueDate,
+      ...cue, title: title.trim(), status, show, batchId: batchId || null, genre, notes, dueDate,
       publisher, exclusivity, placement, tuneSat, ascap, onDisco, musicalKey, bpm, duration,
       airings, airNetwork, airShow, airEpisode, firstAirDate, audioPath, collaborators, splitSheet,
     })
@@ -427,6 +429,12 @@ export function EditCueModal({ cue, batches, onSave, onAddBatch, onClose, userId
           <input value={title} onChange={(e) => setTitle(e.target.value)} autoFocus />
         </div>
         <div className="field-row">
+          <div className="field">
+            <label className="label">Status</label>
+            <select value={status} onChange={(e) => setStatus(e.target.value)}>
+              {ALL_STATUS_OPTIONS.map((s) => (<option key={s.value} value={s.value}>{s.label}</option>))}
+            </select>
+          </div>
           <div className="field">
             <label className="label">Show</label>
             <OptionSelect value={show} onChange={setShow} options={showOptions} onAddOption={(v) => onAddOption('show', v)} canAdd={optionsEnabled} placeholder="New show" />
