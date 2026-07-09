@@ -1,0 +1,54 @@
+<!-- @dsCard group="Components" name="Navigation & Tabs" subtitle="Primary nav, catalog tabs & pill groups" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');
+  :root{--blue:#4a60dc;--orange:#e88a3a;--dark:#1a1a2e;--bg:#f7f8fc;--card:#fff;--border:#e8ecf4;--text-secondary:#8b90a8;--radius:12px;--radius-sm:8px}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Outfit',-apple-system,sans-serif;background:var(--bg);color:var(--dark);padding:28px;-webkit-font-smoothing:antialiased}
+  h2{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--text-secondary);margin:0 0 12px}
+  .block{margin-bottom:26px}
+  .nav{display:flex;background:var(--card);border-radius:var(--radius);padding:4px;border:1px solid var(--border);width:fit-content}
+  .nav-btn{padding:8px 20px;font-size:13px;font-weight:600;color:var(--text-secondary);background:transparent;border:none;border-radius:var(--radius-sm);cursor:pointer;position:relative}
+  .nav-btn.active{color:var(--dark);background:var(--bg);box-shadow:0 1px 3px rgba(0,0,0,.06)}
+  .nav-btn .badge{position:absolute;top:2px;right:4px;background:var(--orange);color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:10px;min-width:16px;text-align:center}
+  .catalog-tabs{display:flex;gap:2px;background:#f1f3f9;border-radius:var(--radius-sm);padding:3px;width:fit-content}
+  .catalog-tab{padding:6px 16px;font-size:12px;font-weight:600;color:var(--text-secondary);background:transparent;border:none;border-radius:6px;cursor:pointer}
+  .catalog-tab.active{color:var(--dark);background:var(--card);box-shadow:0 1px 3px rgba(0,0,0,.06)}
+  .pill-group{display:flex;gap:2px;background:#f1f3f9;border-radius:var(--radius-sm);padding:3px;width:fit-content}
+  .pill{padding:6px 14px;font-size:12px;font-weight:600;color:var(--text-secondary);background:transparent;border:none;border-radius:6px;cursor:pointer}
+  .pill.active{color:var(--dark);background:var(--card);box-shadow:0 1px 3px rgba(0,0,0,.06)}
+</style>
+</head>
+<body>
+  <div class="block">
+    <h2>Primary nav</h2>
+    <div class="nav">
+      <button class="nav-btn active">Pipeline</button>
+      <button class="nav-btn">Catalog<span class="badge">66</span></button>
+      <button class="nav-btn">Royalties</button>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>Catalog tabs</h2>
+    <div class="catalog-tabs">
+      <button class="catalog-tab active">All</button>
+      <button class="catalog-tab">Accepted</button>
+      <button class="catalog-tab">Aired</button>
+      <button class="catalog-tab">Available</button>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>Pill group</h2>
+    <div class="pill-group">
+      <button class="pill active">Below Deck</button>
+      <button class="pill">The Challenge</button>
+      <button class="pill">Ad-Hoc</button>
+    </div>
+  </div>
+</body>
+</html>

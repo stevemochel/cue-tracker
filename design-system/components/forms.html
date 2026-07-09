@@ -1,0 +1,50 @@
+<!-- @dsCard group="Components" name="Forms" subtitle="Inputs, selects, labels, field rows & checkbox" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');
+  :root{--blue:#4a60dc;--bg:#f7f8fc;--card:#fff;--border:#e8ecf4;--text:#2d3148;--text-secondary:#8b90a8;--radius-sm:8px}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Outfit',-apple-system,sans-serif;background:var(--card);color:var(--text);padding:28px;-webkit-font-smoothing:antialiased}
+  input,select{width:100%;padding:9px 12px;font-size:13px;color:var(--text);background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);outline:none;font-family:inherit;transition:border-color .15s}
+  input:focus,select:focus{border-color:var(--blue)}
+  .label{display:block;font-size:10px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}
+  .field{margin-bottom:14px;max-width:520px}
+  .field-row{display:flex;gap:12px;max-width:520px}
+  .field-row>.field{flex:1}
+  .check{display:inline-flex;align-items:center;gap:8px;font-size:13px;cursor:pointer}
+  .check input{width:auto}
+  .hint{font-size:11px;color:var(--text-secondary);margin-top:6px}
+</style>
+</head>
+<body>
+  <div class="field">
+    <label class="label">Cue Title</label>
+    <input value="Dawn's Awakening" />
+  </div>
+  <div class="field-row">
+    <div class="field">
+      <label class="label">BPM</label>
+      <input value="120" />
+    </div>
+    <div class="field">
+      <label class="label">Key</label>
+      <select><option>Am</option><option>C</option><option>Gm</option></select>
+    </div>
+    <div class="field">
+      <label class="label">Due Date</label>
+      <input type="date" value="2026-07-15" />
+    </div>
+  </div>
+  <div class="field">
+    <label class="label">Publisher</label>
+    <select><option>Paint The Noise</option><option>Atomica Music</option><option>+ Add new…</option></select>
+  </div>
+  <div class="field">
+    <label class="check"><input type="checkbox" checked /> Signed split sheet on file</label>
+    <div class="hint">Focus state uses the brand blue border.</div>
+  </div>
+</body>
+</html>

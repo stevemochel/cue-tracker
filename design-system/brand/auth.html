@@ -1,0 +1,46 @@
+<!-- @dsCard group="Brand" name="Auth Card" subtitle="Sign-in surface with tabs & gradient backdrop" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');
+  :root{--blue:#4a60dc;--orange:#e88a3a;--dark:#1a1a2e;--bg:#f7f8fc;--card:#fff;--border:#e8ecf4;--text:#2d3148;--text-secondary:#8b90a8;--radius-sm:8px}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Outfit',-apple-system,sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:linear-gradient(160deg,#eef1ff 0%,#f7f8fc 55%);-webkit-font-smoothing:antialiased}
+  input{width:100%;padding:9px 12px;font-size:13px;color:var(--text);background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);outline:none;font-family:inherit}
+  .auth-card{width:100%;max-width:400px;background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:0 4px 16px rgba(26,26,46,.08);padding:32px}
+  .auth-header{text-align:center;margin-bottom:22px}
+  .brand-mark{width:56px;height:56px;border-radius:14px;margin:0 auto 10px;background:linear-gradient(135deg,var(--orange),var(--blue));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:26px}
+  .brand-placed{font-size:22px;font-weight:800;color:var(--dark)}
+  .brand-sub{font-size:11px;color:var(--text-secondary);font-weight:600;letter-spacing:.12em;text-transform:uppercase;margin-top:4px}
+  .auth-tabs{display:flex;gap:4px;background:#f1f3f9;padding:4px;border-radius:var(--radius-sm);margin-bottom:20px}
+  .auth-tab{flex:1;border:none;background:transparent;padding:8px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600;color:var(--text-secondary)}
+  .auth-tab.active{background:var(--card);color:var(--dark);box-shadow:0 1px 3px rgba(0,0,0,.06)}
+  .auth-form{display:flex;flex-direction:column;gap:14px}
+  .label{display:block;font-size:10px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}
+  .btn-primary{background:var(--orange);color:#fff;border:none;border-radius:var(--radius-sm);padding:11px;font-size:13px;font-weight:600;cursor:pointer;width:100%}
+  .auth-footer{margin-top:16px;text-align:center}
+  .auth-link{background:none;border:none;color:var(--blue);font-size:13px;font-weight:600;cursor:pointer}
+</style>
+</head>
+<body>
+  <div class="auth-card">
+    <div class="auth-header">
+      <div class="brand-mark">P</div>
+      <div class="brand-placed">Placed</div>
+      <div class="brand-sub">From Pitched to Placed</div>
+    </div>
+    <div class="auth-tabs">
+      <button class="auth-tab active">Sign In</button>
+      <button class="auth-tab">Sign Up</button>
+    </div>
+    <form class="auth-form" onsubmit="return false">
+      <div><label class="label">Email</label><input type="email" value="you@studio.com" /></div>
+      <div><label class="label">Password</label><input type="password" value="password" /></div>
+      <button class="btn-primary">Sign In</button>
+    </form>
+    <div class="auth-footer"><button class="auth-link">Forgot your password?</button></div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,15 @@
+# Netlify configuration for Placed (Vite single-page app).
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# Single-page-app fallback: every route serves index.html so client-side
+# routing (e.g. refreshing on /login) works instead of 404-ing.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

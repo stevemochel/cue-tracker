@@ -1,0 +1,67 @@
+<!-- @dsCard group="Components" name="Cue Card" subtitle="Pipeline kanban card with tags & actions" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');
+  :root{--blue:#4a60dc;--orange:#e88a3a;--red:#dc2626;--green:#16a34a;--dark:#1a1a2e;--bg:#f7f8fc;--card:#fff;--border:#e8ecf4;--border-light:#f1f4f9;--text-secondary:#8b90a8}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Outfit',-apple-system,sans-serif;background:var(--bg);padding:28px;-webkit-font-smoothing:antialiased}
+  .wrap{display:flex;gap:14px;flex-wrap:wrap}
+  .cue-card{background:var(--card);border-radius:10px;padding:12px 14px;border:1px solid var(--border-light);border-left:3px solid var(--blue);box-shadow:0 1px 4px rgba(26,26,46,.06);width:280px}
+  .cue-card.orange{border-left-color:var(--orange)}
+  .cue-card.green{border-left-color:var(--green)}
+  .cue-card-top{display:flex;justify-content:space-between;align-items:flex-start}
+  .cue-card-title{font-size:13px;font-weight:600;color:var(--dark)}
+  .cue-card-due{font-size:10px;font-weight:600;margin-left:8px;white-space:nowrap;color:var(--red)}
+  .cue-card-due.ok{color:var(--green)}
+  .cue-card-genre{font-size:11px;color:var(--text-secondary);margin-top:2px}
+  .cue-card-actions{display:flex;gap:2px;flex-shrink:0;margin-left:8px}
+  .btn-icon{width:24px;height:24px;display:flex;align-items:center;justify-content:center;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text-secondary);cursor:pointer;font-size:11px}
+  .cue-card-tags{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+  .tag{font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;border:1px solid transparent;background:var(--bg);color:var(--text-secondary)}
+  .cue-card-notes{font-size:11px;color:var(--text-secondary);margin-top:6px;line-height:1.4}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="cue-card">
+      <div class="cue-card-top">
+        <div>
+          <div class="cue-card-title">Dawn's Awakening</div>
+          <div class="cue-card-genre">Ambient / Cinematic</div>
+        </div>
+        <div class="cue-card-due">Due Jul 15</div>
+      </div>
+      <div class="cue-card-tags"><span class="tag">120 BPM</span><span class="tag">Am</span><span class="tag">Below Deck</span></div>
+      <div class="cue-card-notes">Soft piano intro building to strings — flagged as a lead option for the reunion promo.</div>
+    </div>
+
+    <div class="cue-card orange">
+      <div class="cue-card-top">
+        <div>
+          <div class="cue-card-title">Stern Warnings</div>
+          <div class="cue-card-genre">Tension / Drama</div>
+        </div>
+        <div class="cue-card-actions">
+          <button class="btn-icon">✎</button>
+          <button class="btn-icon">↦</button>
+        </div>
+      </div>
+      <div class="cue-card-tags"><span class="tag">96 BPM</span><span class="tag">Dm</span><span class="tag">The Challenge</span></div>
+    </div>
+
+    <div class="cue-card green">
+      <div class="cue-card-top">
+        <div>
+          <div class="cue-card-title">Coastal Drift</div>
+          <div class="cue-card-genre">Indie / Uplifting</div>
+        </div>
+        <div class="cue-card-due ok">Delivered</div>
+      </div>
+      <div class="cue-card-tags"><span class="tag">110 BPM</span><span class="tag">G</span></div>
+    </div>
+  </div>
+</body>
+</html>
