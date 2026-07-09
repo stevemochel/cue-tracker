@@ -1,0 +1,32 @@
+<!-- @dsCard group="Foundations" name="Typography" subtitle="Outfit type scale & labels" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');
+  :root{--dark:#1a1a2e;--text:#2d3148;--text-secondary:#8b90a8;--bg:#f7f8fc;--card:#fff;--border:#e8ecf4;--blue:#4a60dc}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Outfit',-apple-system,sans-serif;background:var(--bg);color:var(--text);padding:28px;-webkit-font-smoothing:antialiased}
+  .row{display:flex;align-items:baseline;gap:16px;padding:12px 0;border-bottom:1px solid var(--border)}
+  .row:last-child{border-bottom:none}
+  .spec{font-size:11px;color:var(--text-secondary);font-family:ui-monospace,monospace;width:130px;flex-shrink:0}
+  .brand-title{font-size:20px;font-weight:900;letter-spacing:.02em;color:var(--dark)}
+  .modal-title{font-size:17px;font-weight:800;color:var(--dark)}
+  .stat-value{font-size:22px;font-weight:800;color:var(--dark)}
+  .body{font-size:13px;font-weight:400}
+  .small{font-size:12px;color:var(--text-secondary)}
+  .label{font-size:10px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.08em}
+  .brand-sub{font-size:11px;color:var(--text-secondary);font-weight:600;letter-spacing:.12em;text-transform:uppercase}
+</style>
+</head>
+<body>
+  <div class="row"><div class="spec">900 · 20px</div><div class="brand-title">Placed</div></div>
+  <div class="row"><div class="spec">800 · 22px</div><div class="stat-value">$12,480.00</div></div>
+  <div class="row"><div class="spec">800 · 17px</div><div class="modal-title">Add a New Cue</div></div>
+  <div class="row"><div class="spec">400 · 13px</div><div class="body">Body copy — cue notes, descriptions, and inline detail text.</div></div>
+  <div class="row"><div class="spec">400 · 12px</div><div class="small">Secondary — muted meta, timestamps, helper text.</div></div>
+  <div class="row"><div class="spec">700 · 10px · caps</div><div class="label">Field Label</div></div>
+  <div class="row"><div class="spec">600 · 11px · caps</div><div class="brand-sub">From Pitched to Placed</div></div>
+</body>
+</html>

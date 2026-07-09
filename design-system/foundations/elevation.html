@@ -1,0 +1,35 @@
+<!-- @dsCard group="Foundations" name="Radius & Elevation" subtitle="Corner radii and shadow tokens" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');
+  :root{--dark:#1a1a2e;--text:#2d3148;--text-secondary:#8b90a8;--bg:#f7f8fc;--card:#fff;--border:#e8ecf4;--radius:12px;--radius-sm:8px;--shadow:0 1px 4px rgba(26,26,46,.06);--shadow-md:0 4px 16px rgba(26,26,46,.08);--shadow-lg:0 12px 40px rgba(26,26,46,.12)}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Outfit',-apple-system,sans-serif;background:var(--bg);color:var(--text);padding:28px;-webkit-font-smoothing:antialiased}
+  h2{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--text-secondary);margin:0 0 14px}
+  .row{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:28px}
+  .tile{width:150px}
+  .box{background:var(--card);border:1px solid var(--border);height:80px}
+  .nm{font-size:12px;font-weight:700;color:var(--dark);margin-top:9px}
+  .hex{font-size:11px;color:var(--text-secondary);font-family:ui-monospace,monospace;margin-top:2px}
+</style>
+</head>
+<body>
+  <h2>Corner Radius</h2>
+  <div class="row">
+    <div class="tile"><div class="box" style="border-radius:6px"></div><div class="nm">Small</div><div class="hex">6px · chips/icons</div></div>
+    <div class="tile"><div class="box" style="border-radius:8px"></div><div class="nm">--radius-sm</div><div class="hex">8px · buttons/inputs</div></div>
+    <div class="tile"><div class="box" style="border-radius:12px"></div><div class="nm">--radius</div><div class="hex">12px · cards/panels</div></div>
+    <div class="tile"><div class="box" style="border-radius:16px"></div><div class="nm">Large</div><div class="hex">16px · modals</div></div>
+  </div>
+
+  <h2>Elevation</h2>
+  <div class="row">
+    <div class="tile"><div class="box" style="border-radius:12px;box-shadow:0 1px 4px rgba(26,26,46,.06)"></div><div class="nm">--shadow</div><div class="hex">cards at rest</div></div>
+    <div class="tile"><div class="box" style="border-radius:12px;box-shadow:0 4px 16px rgba(26,26,46,.08)"></div><div class="nm">--shadow-md</div><div class="hex">hover / raised</div></div>
+    <div class="tile"><div class="box" style="border-radius:12px;box-shadow:0 12px 40px rgba(26,26,46,.12)"></div><div class="nm">--shadow-lg</div><div class="hex">modals / overlays</div></div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,27 @@
+<!-- @dsCard group="Components" name="Stats Bar" subtitle="Segmented KPI summary row" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');
+  :root{--blue:#4a60dc;--orange:#e88a3a;--green:#16a34a;--dark:#1a1a2e;--bg:#f7f8fc;--card:#fff;--border:#e8ecf4;--border-light:#f1f4f9;--text-secondary:#8b90a8;--radius:12px}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Outfit',-apple-system,sans-serif;background:var(--bg);padding:28px;-webkit-font-smoothing:antialiased}
+  .stats{display:flex;background:var(--card);border-radius:var(--radius);border:1px solid var(--border);overflow:hidden;max-width:760px}
+  .stat{flex:1;padding:14px 16px;text-align:center;border-right:1px solid var(--border-light)}
+  .stat:last-child{border-right:none}
+  .stat-value{font-size:22px;font-weight:800;color:var(--dark)}
+  .stat-label{font-size:10px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.06em;margin-top:2px;font-weight:600}
+</style>
+</head>
+<body>
+  <div class="stats">
+    <div class="stat"><div class="stat-value">66</div><div class="stat-label">Total Cues</div></div>
+    <div class="stat"><div class="stat-value" style="color:var(--orange)">8</div><div class="stat-label">In Progress</div></div>
+    <div class="stat"><div class="stat-value" style="color:var(--green)">41</div><div class="stat-label">Accepted</div></div>
+    <div class="stat"><div class="stat-value" style="color:var(--blue)">17</div><div class="stat-label">Aired</div></div>
+    <div class="stat"><div class="stat-value">$12,480</div><div class="stat-label">Earned</div></div>
+  </div>
+</body>
+</html>
