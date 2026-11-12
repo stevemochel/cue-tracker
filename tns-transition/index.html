@@ -96,13 +96,13 @@
       radial-gradient(90% 90% at 4% 100%, rgba(214, 112, 30, 0.75) 0%, rgba(214, 112, 30, 0) 60%),
       var(--orange);
   }
-  .fgl-tns .meet .wrap { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: clamp(28px, 5vw, 64px); align-items: start; }
+  .fgl-tns .meet .wrap { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: clamp(28px, 5vw, 64px); align-items: stretch; }
   .fgl-tns .meet .copy { display: flex; flex-direction: column; gap: 18px; }
   .fgl-tns .meet .rule { background: var(--charcoal); }
   .fgl-tns .meet .lead { color: var(--charcoal); }
-  .fgl-tns .meet .car { width: 100%; aspect-ratio: 646 / 398; object-fit: cover; border-radius: 20px; margin-top: 8px; }
+  .fgl-tns .meet .car { width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; object-position: 50% 60%; border-radius: 20px; margin-top: 8px; }
   .fgl-tns .features { display: flex; flex-direction: column; gap: 16px; }
-  .fgl-tns .feature { background: var(--white); border-radius: 20px; padding: 24px 26px; display: flex; gap: 18px; align-items: flex-start; }
+  .fgl-tns .feature { flex: 1; background: var(--white); border-radius: 20px; padding: 24px 26px; display: flex; gap: 18px; align-items: center; }
   .fgl-tns .feature svg { flex: none; }
   .fgl-tns .feature div { display: flex; flex-direction: column; gap: 6px; }
 
