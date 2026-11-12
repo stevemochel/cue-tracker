@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fresh Green Light is joining The Next Street</title>
+<meta name="description" content="Fresh Green Light is joining The Next Street. Your lessons, classes and road test dates are honored, and you'll keep seeing familiar faces.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;700&display=swap">
+<style>
+  /* Everything is scoped under .fgl-tns so it can't collide with WordPress theme styles. */
+  .fgl-tns, .fgl-tns *, .fgl-tns *::before, .fgl-tns *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #FFFFFF; }
+
+  .fgl-tns {
+    --orange: #F58A21;
+    --clementine: #FAB51C;
+    --orange-deep: #D6701E;
+    --sky: #1F8396;
+    --sky-deep: #166878;
+    --aqua: #29D9CF;
+    --gray: #3B3B3B;
+    --charcoal: #262626;
+    --body: #3A3A3A;
+    --light: #F5F5F7;
+    --line: #E6E6E6;
+    --white: #FFFFFF;
+
+    font-family: 'Prometo', 'Exo 2', Arial, sans-serif;
+    font-weight: 400;
+    color: var(--body);
+    background: var(--white);
+    -webkit-font-smoothing: antialiased;
+    min-width: 0;
+  }
+  .fgl-tns img { display: block; max-width: 100%; }
+  .fgl-tns h1, .fgl-tns h2, .fgl-tns h3, .fgl-tns p { margin: 0; }
+  .fgl-tns a { color: #076E83; }
+  .fgl-tns a:hover { color: #1F8093; }
+
+  .fgl-tns .wrap { max-width: 1080px; margin: 0 auto; }
+  .fgl-tns .section { padding: clamp(56px, 7vw, 88px) 20px; }
+
+  /* Section titles with the 72x3 underline */
+  .fgl-tns .title { font-weight: 700; font-size: clamp(26px, 3vw, 30px); line-height: 1.2; color: var(--charcoal); }
+  .fgl-tns .rule { display: block; width: 72px; height: 3px; margin-top: 14px; background: var(--orange); }
+  .fgl-tns .center { text-align: center; }
+  .fgl-tns .center .rule { margin-left: auto; margin-right: auto; }
+
+  /* Pill buttons */
+  .fgl-tns .btns { display: flex; flex-wrap: wrap; gap: 12px; padding-top: 8px; }
+  .fgl-tns .btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-height: 50px; padding: 0 35px; border-radius: 30px;
+    font-family: inherit; font-size: 16px; text-decoration: none;
+    transition: filter .15s ease, background-color .15s ease, color .15s ease;
+  }
+  .fgl-tns .btn-orange { background: var(--orange); color: var(--charcoal); font-weight: 700; }
+  .fgl-tns .btn-orange:hover { color: var(--charcoal); filter: brightness(1.06); }
+  .fgl-tns .btn-outline { border: 2px solid var(--charcoal); color: var(--charcoal); font-weight: 500; }
+  .fgl-tns .btn-outline:hover { background: var(--charcoal); color: var(--white); }
+  .fgl-tns .btn-dark { background: var(--gray); color: var(--white); font-weight: 500; }
+  .fgl-tns .btn-dark:hover { background: var(--charcoal); color: var(--white); }
+  .fgl-tns .btn:focus-visible, .fgl-tns summary:focus-visible { outline: 3px solid var(--aqua); outline-offset: 3px; }
+
+  /* Logo strip */
+  .fgl-tns .logos { background: var(--white); border-bottom: 1px solid var(--line); padding: 24px 20px; }
+  .fgl-tns .logos .wrap { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 14px 28px; }
+  .fgl-tns .logos .fgl { height: 52px; width: auto; }
+  .fgl-tns .logos .tns { height: 26px; width: auto; }
+  .fgl-tns .logos span { font-weight: 500; font-size: 16px; color: var(--gray); }
+
+  /* Hero */
+  .fgl-tns .hero .wrap { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: clamp(32px, 5vw, 64px); align-items: center; }
+  .fgl-tns .hero .copy { display: flex; flex-direction: column; gap: 20px; }
+  .fgl-tns .hero h1 { font-weight: 700; font-size: clamp(30px, 3.6vw, 40px); line-height: 1.15; color: var(--charcoal); }
+  .fgl-tns .hero .rule { margin-top: 16px; }
+  .fgl-tns .lead { font-size: 18px; line-height: 1.65; color: var(--body); }
+  .fgl-tns .sig { font-size: 18px; line-height: 1.5; color: var(--charcoal); }
+  .fgl-tns .sig strong { font-weight: 700; }
+  .fgl-tns .hero .photo { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; object-position: 30% 25%; border-radius: 20px; }
+
+  /* What stays the same */
+  .fgl-tns .same { background: var(--light); }
+  .fgl-tns .same .wrap { display: flex; flex-direction: column; align-items: center; gap: 40px; }
+  .fgl-tns .cards { width: 100%; max-width: 980px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 20px; }
+  .fgl-tns .card { background: var(--white); border-radius: 20px; padding: 32px 24px; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; }
+  .fgl-tns .card h3, .fgl-tns .feature h3 { font-weight: 700; font-size: 20px; line-height: 1.25; color: var(--charcoal); }
+  .fgl-tns .card p, .fgl-tns .feature p { font-size: 16px; line-height: 1.6; color: var(--body); }
+
+  /* Meet The Next Street (orange) */
+  .fgl-tns .meet {
+    background:
+      radial-gradient(120% 90% at 88% 8%, rgba(250, 181, 28, 0.85) 0%, rgba(250, 181, 28, 0) 55%),
+      radial-gradient(90% 90% at 4% 100%, rgba(214, 112, 30, 0.75) 0%, rgba(214, 112, 30, 0) 60%),
+      var(--orange);
+  }
+  .fgl-tns .meet .wrap { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: clamp(28px, 5vw, 64px); align-items: start; }
+  .fgl-tns .meet .copy { display: flex; flex-direction: column; gap: 18px; }
+  .fgl-tns .meet .rule { background: var(--charcoal); }
+  .fgl-tns .meet .lead { color: var(--charcoal); }
+  .fgl-tns .meet .car { width: 100%; aspect-ratio: 646 / 398; object-fit: cover; border-radius: 20px; margin-top: 8px; }
+  .fgl-tns .features { display: flex; flex-direction: column; gap: 16px; }
+  .fgl-tns .feature { background: var(--white); border-radius: 20px; padding: 24px 26px; display: flex; gap: 18px; align-items: flex-start; }
+  .fgl-tns .feature svg { flex: none; }
+  .fgl-tns .feature div { display: flex; flex-direction: column; gap: 6px; }
+
+  /* FAQ (sky) — native <details>, no JS */
+  .fgl-tns .faq {
+    background:
+      radial-gradient(70% 90% at 92% 6%, rgba(41, 217, 207, 0.5) 0%, rgba(41, 217, 207, 0) 60%),
+      radial-gradient(80% 90% at 0% 100%, rgba(22, 104, 120, 0.9) 0%, rgba(22, 104, 120, 0) 70%),
+      var(--sky);
+  }
+  .fgl-tns .faq .wrap { max-width: 860px; display: flex; flex-direction: column; gap: 28px; }
+  .fgl-tns .faq .title { color: var(--white); }
+  .fgl-tns .faq .rule { background: var(--aqua); }
+  .fgl-tns .faq-list { display: flex; flex-direction: column; gap: 4px; }
+  .fgl-tns .faq summary {
+    list-style: none; cursor: pointer;
+    min-height: 52px; display: flex; align-items: center; gap: 12px; padding: 12px 0;
+    font-weight: 700; font-size: 19px; line-height: 1.35; color: var(--white);
+  }
+  .fgl-tns .faq summary::-webkit-details-marker { display: none; }
+  .fgl-tns .faq summary svg { flex: none; transition: transform .2s ease; }
+  .fgl-tns .faq details[open] summary svg { transform: rotate(180deg); }
+  .fgl-tns .faq details p { padding: 0 0 16px 30px; font-size: 17px; line-height: 1.6; color: var(--white); }
+  .fgl-tns .faq details a { color: var(--white); }
+  .fgl-tns .faq details a:hover { color: var(--white); text-decoration-thickness: 2px; }
+
+  /* Contact */
+  .fgl-tns .contact { position: relative; overflow: hidden; background: var(--light); }
+  .fgl-tns .contact .topo { position: absolute; right: -60px; top: 50%; width: 640px; max-width: none; height: auto; transform: translateY(-50%); opacity: 0.22; pointer-events: none; }
+  .fgl-tns .contact .wrap { position: relative; max-width: 680px; display: flex; flex-direction: column; align-items: center; gap: 18px; text-align: center; }
+  .fgl-tns .contact .btns { justify-content: center; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .fgl-tns *, .fgl-tns *::before, .fgl-tns *::after { transition: none !important; }
+  }
+</style>
+</head>
+<body>
+<main class="fgl-tns">
+
+  <div class="logos">
+    <div class="wrap">
+      <img class="fgl" src="images/fgl-logo.png" alt="Fresh Green Light" width="141" height="52">
+      <span>is joining</span>
+      <img class="tns" src="images/tns-logo.svg" alt="The Next Street" width="299" height="26">
+    </div>
+  </div>
+
+  <section class="section hero">
+    <div class="wrap">
+      <div class="copy">
+        <div>
+          <h1>Fresh Green Light is joining The Next Street</h1>
+          <span class="rule" aria-hidden="true"></span>
+        </div>
+        <p class="lead">After 17 years and more than 35,000 new drivers, we're retiring and handing the keys to The Next Street: a family-run Connecticut driving school that started the same year we did and grew into the state's leader in driver's education. The transition happens in mid-December. For you, nothing changes: you'll get everything you paid for, and you'll continue to see many familiar faces.</p>
+        <p class="sig"><strong>Steve &amp; Laura</strong><br>Founders, Fresh Green Light</p>
+        <div class="btns">
+          <a class="btn btn-orange" href="#faq">Common Questions</a>
+          <a class="btn btn-outline" href="#contact">Contact Us</a>
+        </div>
+      </div>
+      <img class="photo" src="images/steve-laura.jpg" alt="Steve and Laura beside a Fresh Green Light car" width="1000" height="1499">
+    </div>
+  </section>
+
+  <section class="section same" aria-labelledby="same-title">
+    <div class="wrap">
+      <div class="center">
+        <h2 class="title" id="same-title">What Stays the Same</h2>
+        <span class="rule" aria-hidden="true"></span>
+      </div>
+      <div class="cards">
+        <div class="card">
+          <svg aria-hidden="true" width="64" height="64" viewBox="0 0 64 64" fill="none" stroke="#F58A21" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="16" y="10" width="32" height="44" rx="3"/><path d="M25 10v-3h14v3"/><path d="M24 33l6 6 11-12"/></svg>
+          <h3>Lessons and classes are honored</h3>
+          <p>Whether you've taken them, scheduled them or still need to book them, they count.</p>
+        </div>
+        <div class="card">
+          <svg aria-hidden="true" width="64" height="64" viewBox="0 0 64 64" fill="none" stroke="#F58A21" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="14" width="46" height="40" rx="3"/><path d="M9 24h46"/><path d="M20 9v9"/><path d="M44 9v9"/><path d="M23 39l6 6 12-12"/></svg>
+          <h3>Road test dates stand</h3>
+          <p>If your road test is booked, that date is still on.</p>
+        </div>
+        <div class="card">
+          <svg aria-hidden="true" width="64" height="64" viewBox="0 0 64 64" fill="none" stroke="#F58A21" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="21" r="8"/><path d="M9 52c0-9 6.7-15 15-15s15 6 15 15"/><circle cx="44" cy="23" r="6.5"/><path d="M42 37.3c1-.2 1.4-.3 2-.3 6.6 0 12 4.8 12 13"/></svg>
+          <h3>Familiar faces</h3>
+          <p>You'll continue to see many familiar faces.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section meet" aria-labelledby="meet-title">
+    <div class="wrap">
+      <div class="copy">
+        <div>
+          <h2 class="title" id="meet-title">Meet The Next Street</h2>
+          <span class="rule" aria-hidden="true"></span>
+        </div>
+        <p class="lead">A family-run Connecticut driving school that started the same year we did and grew into the state's leader in driver's education.</p>
+        <img class="car" src="images/tns-car.png" alt="A white The Next Street driving school car" width="646" height="398" loading="lazy">
+      </div>
+      <div class="features">
+        <div class="feature">
+          <svg aria-hidden="true" width="44" height="44" viewBox="0 0 64 64" fill="none" stroke="#F58A21" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 36v-6a20 20 0 0 1 40 0v6"/><rect x="8" y="36" width="10" height="14" rx="3"/><rect x="46" y="36" width="10" height="14" rx="3"/><path d="M51 50c0 5-5 7-12 7h-5"/></svg>
+          <div>
+            <h3>Full-service customer support</h3>
+            <p>A customer support team you can reach by phone, text, email or chat.</p>
+          </div>
+        </div>
+        <div class="feature">
+          <svg aria-hidden="true" width="44" height="44" viewBox="0 0 64 64" fill="none" stroke="#F58A21" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="12" width="52" height="34" rx="3"/><path d="M22 54h20"/><path d="M32 46v8"/><path d="M27 23v12l10-6z"/></svg>
+          <div>
+            <h3>Over 20 class sessions a day</h3>
+            <p>Offered every day, with programs for every family's scheduling need.</p>
+          </div>
+        </div>
+        <div class="feature">
+          <svg aria-hidden="true" width="44" height="44" viewBox="0 0 64 64" fill="none" stroke="#F58A21" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M32 58s18-17.5 18-31a18 18 0 0 0-36 0c0 13.5 18 31 18 31z"/><circle cx="32" cy="27" r="7"/></svg>
+          <div>
+            <h3>More locations in Fairfield County</h3>
+            <p>Including Stamford, Norwalk, Redding, Monroe, Newtown and Danbury.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section faq" id="faq" aria-labelledby="faq-title">
+    <div class="wrap">
+      <div>
+        <h2 class="title" id="faq-title">Common Questions</h2>
+        <span class="rule" aria-hidden="true"></span>
+      </div>
+      <div class="faq-list">
+        <details open>
+          <summary><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg><span>Will the lessons and classes I've paid for be honored?</span></summary>
+          <p>Yes, every one: lessons and classes you've already taken, ones you've scheduled and ones you still need to book.</p>
+        </details>
+        <details>
+          <summary><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg><span>Do I need to do anything right now?</span></summary>
+          <p>No. Keep booking the way you do now.</p>
+        </details>
+        <details>
+          <summary><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg><span>Is my road test date still on?</span></summary>
+          <p>Yes. Booked dates stand.</p>
+        </details>
+        <details>
+          <summary><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg><span>Will I keep my instructor?</span></summary>
+          <p>You'll continue to see many familiar faces. We can't promise a specific instructor.</p>
+        </details>
+        <details>
+          <summary><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg><span>Can I still sign up?</span></summary>
+          <p>Yes. Anything you buy is honored after the transition.</p>
+        </details>
+        <details>
+          <summary><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg><span>What happens in mid-December?</span></summary>
+          <p>Before the transition, we'll email every family a short guide covering what changes and when: dates, logging in, booking and payments.</p>
+        </details>
+        <details>
+          <summary><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg><span>Who do I contact with questions?</span></summary>
+          <p>Our office, as always: <a href="tel:+12038611188" target="_top">203.861.1188</a> · <a href="mailto:lessons@freshgreenlight.com" target="_top">lessons@freshgreenlight.com</a></p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <section class="section contact" id="contact" aria-labelledby="contact-title">
+    <img class="topo" src="images/topo-texture.svg" alt="" aria-hidden="true">
+    <div class="wrap">
+      <div>
+        <h2 class="title" id="contact-title">Questions? Our Office, as Always.</h2>
+        <span class="rule" aria-hidden="true" style="margin-left:auto;margin-right:auto"></span>
+      </div>
+      <p class="lead">We're here to help through the transition and after.</p>
+      <div class="btns">
+        <a class="btn btn-dark" href="tel:+12038611188" target="_top">Call 203.861.1188</a>
+        <a class="btn btn-dark" href="mailto:lessons@freshgreenlight.com" target="_top">Email Us</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+</body>
+</html>
